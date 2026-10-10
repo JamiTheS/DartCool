@@ -206,3 +206,16 @@ for (const shot of SHOTS) {
 }
 
 console.log(`Terminé : ${SHOTS.length} captures dans store/appstore/iphone-6.9`);
+
+// App Store Connect ne demande plus qu'une famille d'écrans iPhone (6,1"/6,3") :
+// on décline le même rendu en 1206 × 2622, la taille attendue au chargement.
+const OUT_61 = resolve(HERE, '../store/appstore/iphone-6.3');
+await mkdir(OUT_61, { recursive: true });
+for (const shot of SHOTS) {
+  await sharp(resolve(OUT, shot.out))
+    .resize(1206, 2622, { fit: 'fill', kernel: 'lanczos3' })
+    .flatten({ background: COL.base })
+    .png({ compressionLevel: 9 })
+    .toFile(resolve(OUT_61, shot.out));
+}
+console.log(`Terminé : ${SHOTS.length} captures 1206 × 2622 dans store/appstore/iphone-6.3`);

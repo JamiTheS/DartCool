@@ -154,15 +154,25 @@ Aucun. Pas de jeu d'argent, pas d'alcool, pas de tabac, pas de contenu généré
 
 ## Checklist avant envoi
 
-- [ ] `npm run check` passe (types, lint, moteur)
-- [ ] Build EAS installé et ouvert sur un iPhone réel : l'app démarre, une partie complète se joue
-- [x] Les deux URLs (assistance, confidentialité) répondent **200** au `curl` *(10/10/2026)*
-- [x] Les pages web sont **commitées et poussées**, GitHub Pages activé sur `/docs`
-- [ ] Captures 6,9" chargées dans App Store Connect
-- [ ] Classification par âge remplie (4+)
-- [ ] Confidentialité publiée : « aucune donnée collectée »
-- [ ] « Connexion requise » décochée
-- [ ] Remarques pour la vérification collées
-- [ ] Build sélectionné sur la version, puis **Ajouter pour vérification**
-- [ ] Dans « Vérification de l'app », la soumission contient bien **1 élément** (la version) —
-      il n'y a aucun achat intégré à rattacher dans cette app
+État au 10 octobre 2026, 21 h.
+
+### Fait
+- [x] `npm run check` passe (types, lint, 70 vérifications du moteur)
+- [x] Les deux URLs (assistance, confidentialité) répondent **200** au `curl`
+- [x] Pages web commitées et poussées, GitHub Pages actif sur `/docs`
+- [x] Fiche App Store Connect créée — app id `6821425205`
+- [x] Build `1.0.0 (1)` compilé par EAS et envoyé à Apple (`eas submit`, 20 h 54)
+- [x] Nom, sous-titre, catégorie **Sports**, droits de contenu « aucun contenu tiers »
+- [x] Classification par âge : **4+** sur 172 pays (alcool, jeux d'argent, concours, coffres à butin : tous à « aucun »)
+- [x] Confidentialité **publiée** : « Le développeur ne collecte aucune donnée avec cette app »
+- [x] Texte promotionnel, description, mots-clés, URLs, version, copyright
+- [x] 7 captures **1206 × 2622** chargées (format iPhone 6,1"/6,3", le seul accepté)
+- [x] « Connexion requise » décochée, coordonnées de vérification complètes
+- [x] Remarques de vérification collées
+
+### Reste à faire
+- [ ] Attendre la fin du traitement Apple, puis **sélectionner le build** dans la section *Build*
+- [ ] **Tester sur un iPhone réel via TestFlight** : une partie complète, un bust, une sortie,
+      la saisie sur la cible. Étape non négociable.
+- [ ] **Ajouter pour vérification**, vérifier que la soumission contient **1 seul élément**
+      (la version — il n'y a aucun achat intégré à rattacher), puis envoyer
