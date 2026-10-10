@@ -9,7 +9,9 @@
     "userInterfaceStyle": "dark",
     "backgroundColor": "#0B0E0C",
     "primaryColor": "#F0B429",
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "bundleIdentifier": "com.dartcool.app",
       "supportsTablet": false,
@@ -53,6 +55,12 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "fa57ab60-a1af-432a-9abd-a2256a18bce1"
+      }
     }
   }
 }
