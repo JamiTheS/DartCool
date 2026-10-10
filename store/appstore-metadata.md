@@ -28,10 +28,11 @@ Langue principale : **français (France)**. Aucune autre langue n'est déclarée
 | **URL de la politique de confidentialité** | `https://jamithes.github.io/DartCool/privacy-policy.html` |
 | **URL marketing** (facultative) | `https://jamithes.github.io/DartCool/` |
 
-> ⚠️ Ces trois URLs supposent un dépôt GitHub `DartCool` sur le compte `jamithes`, avec
-> **GitHub Pages activé sur le dossier `/docs` de la branche `main`**. Si le compte ou le nom du
-> dépôt changent, mettre à jour **`src/data/links.ts`** *et* les champs d'App Store Connect.
-> Avant chaque soumission : `curl -s -o /dev/null -w "%{http_code}" <url>` doit répondre **200**.
+> ✅ En ligne depuis le 10 octobre 2026 : dépôt public `JamiTheS/DartCool`, GitHub Pages servi
+> depuis `/docs` sur la branche `main`. Les trois URLs répondent **200** (vérifié au `curl`).
+> Les mêmes adresses sont codées dans `src/data/links.ts` : si le dépôt est renommé ou rendu
+> privé, mettre à jour ce fichier *et* les champs d'App Store Connect. À revérifier au `curl`
+> avant chaque soumission — une URL d'assistance morte est un refus à elle seule.
 
 ## Confidentialité de l'app
 
@@ -155,8 +156,8 @@ Aucun. Pas de jeu d'argent, pas d'alcool, pas de tabac, pas de contenu généré
 
 - [ ] `npm run check` passe (types, lint, moteur)
 - [ ] Build EAS installé et ouvert sur un iPhone réel : l'app démarre, une partie complète se joue
-- [ ] Les deux URLs (assistance, confidentialité) répondent **200** au `curl`
-- [ ] Les pages web sont **commitées et poussées**, GitHub Pages activé sur `/docs`
+- [x] Les deux URLs (assistance, confidentialité) répondent **200** au `curl` *(10/10/2026)*
+- [x] Les pages web sont **commitées et poussées**, GitHub Pages activé sur `/docs`
 - [ ] Captures 6,9" chargées dans App Store Connect
 - [ ] Classification par âge remplie (4+)
 - [ ] Confidentialité publiée : « aucune donnée collectée »

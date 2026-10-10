@@ -116,8 +116,10 @@ npm run store:shots    # recompose les captures App Store depuis store/raw/
 Fonctionnel et complet : dix moteurs de jeu vérifiés, quatre écrans de score, trois saisies,
 statistiques, règles, carnet de joueurs, visuels et captures générés, pages web rédigées.
 
+Dépôt public : `JamiTheS/DartCool`, branche `main`. Les pages sont en ligne via GitHub Pages
+(`/docs`) : accueil, confidentialité et aide répondent 200.
+
 Reste à faire, côté humain (voir `store/appstore-metadata.md`) :
-- créer le dépôt GitHub, activer Pages sur `/docs`, vérifier les deux URLs au `curl` ;
 - créer la fiche App Store Connect, renseigner `ascAppId` dans `eas.json` ;
 - `eas build --profile production` puis `eas submit`, et tester le build sur un iPhone réel.
 
