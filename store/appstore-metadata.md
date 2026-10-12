@@ -52,10 +52,17 @@ Dix modes de jeu, trois façons de saisir, les sorties calculées pour vous. Dar
 
 ## Description (4000 car. max)
 
+> Texte **en ligne** dans App Store Connect depuis le 12 octobre 2026.
+
 ```
 DartCool tient le score de vos parties de fléchettes, du 501 du vendredi soir au Cricket qui s'éternise.
 
 Posez le téléphone sur le comptoir, ajoutez les joueurs, lancez : l'app s'occupe du reste.
+
+LA CIBLE, EN GRAND
+Appuyez exactement là où la fléchette est plantée. L'anneau extérieur compte un double, l'anneau intérieur un triple, le centre les 25 et le bull. Chaque appui laisse sa marque à l'endroit touché, et la troisième fléchette passe la main au joueur suivant. Aucun calcul, aucune traduction mentale.
+
+Et si vous préférez taper les chiffres, deux autres saisies sont à un appui : le pavé (un multiplicateur, un numéro) et le total de la volée (trois chiffres et c'est au suivant).
 
 DIX MODES DE JEU
 • X01 — 501, 301, 201, 701, 1001, en sortie double, simple ou maître, avec ou sans entrée double, en manches et en sets
@@ -69,15 +76,10 @@ DIX MODES DE JEU
 • Killer — chacun son numéro, le dernier debout gagne
 • Baseball — neuf manches, neuf numéros
 
-TROIS FAÇONS DE SAISIR, AU CHOIX
-• Le pavé : un appui sur le multiplicateur, un appui sur le numéro. Il revient tout seul sur « simple » pour éviter les erreurs.
-• La vraie cible : appuyez exactement là où la fléchette est plantée, doubles et triples compris.
-• Le total de la volée : trois chiffres et c'est au suivant, quand ça va vite.
-
 LE SCORE QUI PENSE AVEC VOUS
 • Le reste s'affiche en grand, et la sortie conseillée apparaît dès qu'elle existe — T20 T19 D12, comme sur le circuit
 • Les busts sont gérés automatiquement, le score revient à sa valeur de début de volée
-• Seules les cibles utiles s'allument : au Cricket, le 1 au 14 s'efface ; au Tour de cadran, seule votre cible reste visible
+• Seules les cibles utiles s'allument : au Cricket, tout ce qui ne compte pas s'éteint sur la cible
 • Annulation illimitée : une erreur de saisie se répare d'un geste, même plusieurs volées en arrière
 • La partie reprend là où vous l'avez laissée, même si l'app a été fermée
 • L'écran reste allumé pendant la partie
@@ -111,13 +113,16 @@ Première version de DartCool : onze modes de jeu, trois façons de saisir les s
 
 | Taille | Dossier | Contenu |
 |---|---|---|
-| iPhone 6,9" — 1290 × 2796 | `store/appstore/iphone-6.9/` | 7 captures composées |
-| Sources brutes | `store/raw/` | captures de l'app, 1290 × 2796, sans habillage |
+| iPhone 6,1"/6,3" — 1206 × 2622 | `store/appstore/iphone-6.3/` | 6 captures composées, **en ligne depuis le 12/10/2026** |
+| Sources brutes | `store/raw/` | captures de l'app, 1206 × 2622, sans habillage |
 
-Ordre proposé : modes → X01 et sortie → saisie sur cible → cricket → statistiques → table des
-sorties → règles.
+Ordre en ligne : cible → formats → cricket → pavé → statistiques → table des sorties.
 
-`supportsTablet` est à `false` dans `app.json` : **aucune capture iPad n'est exigée**.
+App Store Connect n'accepte plus qu'une seule famille d'écrans iPhone : ces captures servent
+pour toutes les tailles. `supportsTablet` est à `false`, **aucune capture iPad n'est exigée**.
+
+Pour les regénérer après un changement d'interface : relancer l'app en web, reprendre les
+captures brutes à 402 × 874 en densité 3, puis `npm run store:shots`.
 
 ---
 
@@ -154,25 +159,23 @@ Aucun. Pas de jeu d'argent, pas d'alcool, pas de tabac, pas de contenu généré
 
 ## Checklist avant envoi
 
-État au 10 octobre 2026, 21 h.
+État au 12 octobre 2026.
 
 ### Fait
 - [x] `npm run check` passe (types, lint, 70 vérifications du moteur)
-- [x] Les deux URLs (assistance, confidentialité) répondent **200** au `curl`
-- [x] Pages web commitées et poussées, GitHub Pages actif sur `/docs`
+- [x] URLs d'assistance et de confidentialité : **200** au `curl`, pages publiées sur GitHub Pages
 - [x] Fiche App Store Connect créée — app id `6821425205`
-- [x] Build `1.0.0 (1)` compilé par EAS et envoyé à Apple (`eas submit`, 20 h 54)
-- [x] Nom, sous-titre, catégorie **Sports**, droits de contenu « aucun contenu tiers »
-- [x] Classification par âge : **4+** sur 172 pays (alcool, jeux d'argent, concours, coffres à butin : tous à « aucun »)
-- [x] Confidentialité **publiée** : « Le développeur ne collecte aucune donnée avec cette app »
-- [x] Texte promotionnel, description, mots-clés, URLs, version, copyright
-- [x] 7 captures **1206 × 2622** chargées (format iPhone 6,1"/6,3", le seul accepté)
-- [x] « Connexion requise » décochée, coordonnées de vérification complètes
-- [x] Remarques de vérification collées
+- [x] Nom, sous-titre, catégorie **Sports**, droits de contenu
+- [x] Classification par âge : **4+** sur 172 pays
+- [x] Confidentialité **publiée** : « aucune donnée collectée »
+- [x] Textes de la fiche en ligne, description mise à jour avec la saisie sur cible
+- [x] 6 captures **1206 × 2622** chargées, dans le style actuel de l'app
+- [x] « Connexion requise » décochée, coordonnées et remarques de vérification complètes
+- [x] Build **1.0.0 (2)** compilé, envoyé, **disponible dans TestFlight**
 
 ### Reste à faire
-- [ ] Attendre la fin du traitement Apple, puis **sélectionner le build** dans la section *Build*
-- [ ] **Tester sur un iPhone réel via TestFlight** : une partie complète, un bust, une sortie,
-      la saisie sur la cible. Étape non négociable.
+- [ ] **Installer le build 2 depuis TestFlight et jouer une vraie partie** : saisie sur cible,
+      double, bull, annulation, fin de manche. Étape non négociable.
+- [ ] Sélectionner le build 2 sur la version
 - [ ] **Ajouter pour vérification**, vérifier que la soumission contient **1 seul élément**
-      (la version — il n'y a aucun achat intégré à rattacher), puis envoyer
+      (la version — aucun achat intégré à rattacher), puis envoyer
