@@ -1,0 +1,573 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>DartCool — direction « Porcelaine »</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet" />
+    <style>
+      :root {
+        --porcelain: #f4f2ef;
+        --porcelain-2: #ece9e4;
+        --card: #ffffff;
+        --ink: #17171c;
+        --ink-2: #6a6a74;
+        --ink-3: #a2a2ac;
+        --hairline: rgba(23, 23, 28, 0.07);
+        --rose-50: #fff2f6;
+        --rose-100: #ffdfe9;
+        --rose-300: #f7a9c4;
+        --rose-600: #d9507e;
+        --rose-800: #8d2d4f;
+        --sage: #5ca888;
+        --clay: #d9696f;
+        --sisal: #efe4cf;
+        --slate: #2b2b33;
+        --r-dock: 34px;
+        --r-card: 22px;
+        --r-key: 16px;
+        --sh-1: 0 1px 2px rgba(23, 23, 28, 0.05);
+        --sh-2: 0 2px 4px rgba(23, 23, 28, 0.04), 0 14px 34px -12px rgba(23, 23, 28, 0.14);
+        --sh-dock: 0 -1px 2px rgba(23, 23, 28, 0.03), 0 -18px 40px -16px rgba(23, 23, 28, 0.18);
+        --glass: rgba(255, 255, 255, 0.72);
+        --font-d: "Barlow Condensed", "DIN Condensed", sans-serif;
+        --font-u: "Inter", -apple-system, system-ui, sans-serif;
+      }
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      body {
+        font-family: var(--font-u);
+        background: #e8e5e0;
+        color: var(--ink);
+        -webkit-font-smoothing: antialiased;
+        padding: 56px 24px 80px;
+      }
+      .page { max-width: 1340px; margin: 0 auto; }
+      .lede { max-width: 680px; margin-bottom: 44px; }
+      .lede h1 {
+        font-family: var(--font-d);
+        font-size: 54px;
+        font-weight: 700;
+        letter-spacing: -0.5px;
+        line-height: 1;
+      }
+      .lede h1 em { font-style: normal; color: var(--rose-600); }
+      .lede p { color: var(--ink-2); font-size: 16px; line-height: 1.65; margin-top: 12px; }
+      .row { display: flex; gap: 34px; flex-wrap: wrap; align-items: flex-start; }
+      .frame { width: 352px; }
+      .frame > figcaption {
+        font-size: 13px;
+        color: var(--ink-2);
+        margin-top: 14px;
+        padding-left: 4px;
+      }
+      .frame > figcaption b { color: var(--ink); font-weight: 600; }
+      .phone {
+        position: relative;
+        width: 352px;
+        height: 762px;
+        border-radius: 46px;
+        background: var(--porcelain);
+        box-shadow: var(--sh-2), 0 0 0 1px rgba(23, 23, 28, 0.06);
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+      }
+      .aura {
+        position: absolute;
+        width: 420px; height: 420px;
+        border-radius: 50%;
+        filter: blur(60px);
+        opacity: 0.5;
+        pointer-events: none;
+      }
+      .status {
+        height: 46px;
+        display: flex; align-items: flex-end; justify-content: space-between;
+        padding: 0 26px 6px;
+        font-size: 13px; font-weight: 600; letter-spacing: 0.2px;
+        position: relative; z-index: 2;
+      }
+      .screen { flex: 1; position: relative; z-index: 2; display: flex; flex-direction: column; min-height: 0; }
+      .pad { padding: 0 18px; }
+
+      .brandline { display: flex; align-items: center; justify-content: space-between; padding: 10px 20px 18px; }
+      .brand { font-family: var(--font-d); font-size: 34px; font-weight: 700; letter-spacing: 0.4px; line-height: 1; }
+      .brand span { color: var(--rose-600); }
+      .sub { font-size: 12.5px; color: var(--ink-3); margin-top: 2px; }
+      .avatar {
+        width: 38px; height: 38px; border-radius: 50%;
+        background: var(--card); box-shadow: var(--sh-1);
+        display: grid; place-items: center; font-size: 13px; font-weight: 600; color: var(--ink-2);
+      }
+
+      .card { background: var(--card); border-radius: var(--r-card); box-shadow: var(--sh-1); }
+      .resume {
+        margin: 0 18px 22px;
+        padding: 16px 18px;
+        border-radius: 26px;
+        background: var(--glass);
+        backdrop-filter: blur(22px) saturate(140%);
+        -webkit-backdrop-filter: blur(22px) saturate(140%);
+        border: 1px solid rgba(255, 255, 255, 0.85);
+        box-shadow: 0 1px 1px rgba(255,255,255,0.9) inset, var(--sh-2);
+        display: flex; align-items: center; gap: 14px;
+      }
+      .resume .dotcol { width: 3px; height: 40px; border-radius: 2px; background: var(--rose-300); }
+      .kicker { font-size: 10.5px; letter-spacing: 1.3px; text-transform: uppercase; color: var(--rose-600); font-weight: 600; }
+      .resume h3 { font-size: 16px; font-weight: 600; margin-top: 2px; }
+      .resume p { font-size: 12.5px; color: var(--ink-2); margin-top: 1px; }
+      .chevron { margin-left: auto; color: var(--ink-3); font-size: 20px; }
+
+      .sectitle { font-size: 11px; letter-spacing: 1.4px; text-transform: uppercase; color: var(--ink-3); font-weight: 600; padding: 0 22px 10px; }
+      .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 0 18px; }
+      .mode { background: var(--card); border-radius: var(--r-card); padding: 15px 16px 14px; box-shadow: var(--sh-1); position: relative; }
+      .mode .num { font-family: var(--font-d); font-size: 36px; font-weight: 600; line-height: 0.95; color: var(--ink); letter-spacing: 0.5px; }
+      .mode.hot { background: linear-gradient(180deg, #fff6f9 0%, #ffffff 58%); box-shadow: var(--sh-1), 0 0 0 1px var(--rose-100); }
+      .mode.hot .num { color: var(--rose-600); }
+      .mode .nm { font-size: 13.5px; font-weight: 600; margin-top: 8px; }
+      .mode .ds { font-size: 11.5px; color: var(--ink-3); margin-top: 1px; }
+
+      .tabbar {
+        margin: auto 14px 14px;
+        height: 64px;
+        border-radius: 32px;
+        background: var(--glass);
+        backdrop-filter: blur(24px) saturate(150%);
+        -webkit-backdrop-filter: blur(24px) saturate(150%);
+        border: 1px solid rgba(255, 255, 255, 0.9);
+        box-shadow: var(--sh-dock);
+        display: grid; grid-template-columns: repeat(4, 1fr); align-items: center;
+      }
+      .tab { text-align: center; font-size: 10.5px; color: var(--ink-3); font-weight: 500; }
+      .tab i { display: block; font-style: normal; font-size: 17px; margin-bottom: 3px; opacity: 0.75; }
+      .tab.on { color: var(--rose-600); }
+      .tab.on i { opacity: 1; }
+
+      .mhead { display: flex; align-items: center; gap: 12px; padding: 6px 20px 14px; }
+      .back { width: 34px; height: 34px; border-radius: 50%; background: var(--card); box-shadow: var(--sh-1); display: grid; place-items: center; color: var(--ink-2); font-size: 16px; }
+      .mtitle { font-size: 15px; font-weight: 600; }
+      .mmeta { font-size: 11.5px; color: var(--ink-3); }
+
+      .hero { margin: 0 18px 12px; padding: 20px 20px 18px; border-radius: 28px; background: var(--card); box-shadow: var(--sh-2); position: relative; overflow: hidden; }
+      .hero .tag { display: inline-flex; align-items: center; gap: 6px; background: var(--rose-50); color: var(--rose-800); font-size: 11px; font-weight: 600; padding: 5px 10px; border-radius: 999px; }
+      .hero .who { font-size: 17px; font-weight: 600; margin-top: 12px; }
+      .score { font-family: var(--font-d); font-size: 108px; font-weight: 700; line-height: 0.86; letter-spacing: -1px; margin: 4px 0 2px; }
+      .score small { font-size: 15px; font-family: var(--font-u); font-weight: 500; color: var(--ink-3); letter-spacing: 0; margin-left: 8px; }
+      .out { display: flex; align-items: center; gap: 6px; margin-top: 12px; }
+      .out .lbl { font-size: 10.5px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--ink-3); font-weight: 600; margin-right: 2px; }
+      .chip { font-family: var(--font-d); font-size: 17px; font-weight: 600; letter-spacing: 0.4px; padding: 3px 11px; border-radius: 10px; background: var(--porcelain-2); color: var(--ink); }
+      .chip.go { background: #e6f4ec; color: #2f6b4f; }
+      .opp { display: flex; align-items: center; gap: 10px; margin: 0 18px 8px; padding: 12px 16px; background: var(--card); border-radius: 18px; box-shadow: var(--sh-1); }
+      .opp .pip { width: 8px; height: 8px; border-radius: 50%; }
+      .opp .nm { font-size: 14px; font-weight: 500; flex: 1; }
+      .opp .sc { font-family: var(--font-d); font-size: 26px; font-weight: 600; }
+
+      .dock {
+        margin-top: auto;
+        padding: 14px 14px 18px;
+        border-radius: var(--r-dock) var(--r-dock) 0 0;
+        background: var(--glass);
+        backdrop-filter: blur(26px) saturate(150%);
+        -webkit-backdrop-filter: blur(26px) saturate(150%);
+        border-top: 1px solid rgba(255, 255, 255, 0.92);
+        box-shadow: var(--sh-dock);
+      }
+      .tray { display: flex; gap: 8px; align-items: center; margin-bottom: 12px; }
+      .slot { flex: 1; height: 50px; border-radius: 15px; display: grid; place-items: center; font-family: var(--font-d); font-size: 22px; font-weight: 600; background: rgba(255,255,255,0.75); box-shadow: var(--sh-1); }
+      .slot.done { background: var(--rose-50); color: var(--rose-800); box-shadow: inset 0 0 0 1px var(--rose-100); }
+      .slot.next { background: #fff; box-shadow: inset 0 0 0 2px var(--rose-300); color: var(--ink-3); }
+      .slot.empty { color: var(--ink-3); }
+      .undo { width: 50px; height: 50px; border-radius: 15px; background: #fff; box-shadow: var(--sh-1); display: grid; place-items: center; color: var(--ink-2); font-size: 17px; }
+      .mult { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; margin-bottom: 9px; }
+      .mb { height: 38px; border-radius: 12px; display: grid; place-items: center; font-size: 11.5px; font-weight: 600; letter-spacing: 1.1px; color: var(--ink-2); background: rgba(255,255,255,0.6); }
+      .mb.on { background: var(--ink); color: #fff; }
+      .keys { display: grid; grid-template-columns: repeat(5, 1fr); gap: 7px; }
+      .key { height: 46px; border-radius: var(--r-key); background: #fff; box-shadow: var(--sh-1); display: grid; place-items: center; font-family: var(--font-d); font-size: 23px; font-weight: 600; }
+      .key.dim { opacity: 0.35; box-shadow: none; background: rgba(255,255,255,0.5); }
+      .key.wide { grid-column: span 2; font-family: var(--font-u); font-size: 12.5px; font-weight: 600; letter-spacing: 0.6px; color: var(--ink-2); }
+      .key.bull { background: var(--clay); color: #fff; }
+      .key.b25 { background: var(--sage); color: #fff; }
+
+      .winner { margin: 2px 18px 14px; padding: 26px 20px 22px; border-radius: 28px; background: linear-gradient(180deg, #fff5f8 0%, #ffffff 70%); box-shadow: var(--sh-2); text-align: center; position: relative; overflow: hidden; }
+      .cupline { font-size: 10.5px; letter-spacing: 1.4px; text-transform: uppercase; color: var(--rose-600); font-weight: 600; }
+      .wname { font-family: var(--font-d); font-size: 44px; font-weight: 700; letter-spacing: 0.4px; line-height: 1; margin-top: 6px; }
+      .wsub { font-size: 13px; color: var(--ink-2); margin-top: 6px; }
+      .rank { margin: 0 18px 12px; padding: 4px 16px; background: var(--card); border-radius: 20px; box-shadow: var(--sh-1); }
+      .rline { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--hairline); }
+      .rline:last-child { border-bottom: 0; }
+      .rline .pos { font-family: var(--font-d); font-size: 19px; width: 16px; color: var(--ink-3); }
+      .rline .pos.one { color: var(--rose-600); }
+      .rline .nm { flex: 1; font-size: 14px; font-weight: 500; }
+      .rline .vl { font-size: 13px; color: var(--ink-2); }
+      .tiles { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; padding: 0 18px; }
+      .tile { background: var(--card); border-radius: 18px; padding: 12px 12px 11px; box-shadow: var(--sh-1); }
+      .tile .k { font-size: 9.5px; letter-spacing: 0.8px; text-transform: uppercase; color: var(--ink-3); font-weight: 600; }
+      .tile .v { font-family: var(--font-d); font-size: 27px; font-weight: 600; margin-top: 3px; }
+      .cta { margin: 16px 18px 0; display: flex; gap: 8px; }
+      .btn { flex: 1; height: 52px; border-radius: 18px; display: grid; place-items: center; font-size: 14px; font-weight: 600; }
+      .btn.p { background: var(--ink); color: #fff; }
+      .btn.s { background: #fff; color: var(--ink); box-shadow: var(--sh-1); }
+
+      .boardwrap { margin-top: auto; padding: 10px 14px 18px; border-radius: var(--r-dock) var(--r-dock) 0 0;
+        background: var(--glass); backdrop-filter: blur(26px) saturate(150%); -webkit-backdrop-filter: blur(26px) saturate(150%);
+        border-top: 1px solid rgba(255,255,255,0.92); box-shadow: var(--sh-dock); }
+      .boardsvg { display: block; width: 100%; height: auto; }
+      .legend { display: flex; justify-content: center; gap: 16px; padding: 2px 0 6px; }
+      .lg { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--ink-2); font-weight: 500; }
+      .lg i { width: 11px; height: 11px; border-radius: 3px; display: block; }
+      .seg { display: flex; gap: 6px; margin: 0 18px 10px; padding: 4px; background: rgba(255,255,255,0.62); border-radius: 16px; box-shadow: inset 0 0 0 1px rgba(23,23,28,0.05); }
+      .seg div { flex: 1; height: 34px; border-radius: 12px; display: grid; place-items: center; font-size: 12.5px; font-weight: 600; color: var(--ink-2); }
+      .seg div.on { background: #fff; color: var(--ink); box-shadow: var(--sh-1); }
+      .specs { margin-top: 56px; display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 14px; }
+      .spec { background: #fff; border-radius: 18px; padding: 18px; box-shadow: var(--sh-1); }
+      .spec h4 { font-size: 13px; font-weight: 600; margin-bottom: 10px; }
+      .sw { display: flex; gap: 7px; flex-wrap: wrap; }
+      .sw i { width: 34px; height: 34px; border-radius: 10px; display: block; box-shadow: inset 0 0 0 1px rgba(23,23,28,0.07); }
+      .spec p { font-size: 12.5px; color: var(--ink-2); line-height: 1.6; }
+      .spec code { font-family: ui-monospace, monospace; font-size: 11.5px; background: var(--porcelain); padding: 1px 5px; border-radius: 5px; }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <div class="lede">
+        <h1>Porcelaine<em>.</em></h1>
+        <p>
+          Blanc chaud, verre là où il sert, un seul rose. Les chiffres gardent leur caractère sportif
+          — c'est ce qui empêche l'app de ressembler à un template.
+        </p>
+      </div>
+
+      <div class="row">
+        <!-- ACCUEIL -->
+        <figure class="frame">
+          <div class="phone">
+            <div class="aura" style="background: #ffd6e5; top: -140px; right: -120px"></div>
+            <div class="aura" style="background: #d9ecdf; bottom: 120px; left: -170px; opacity: 0.35"></div>
+            <div class="status"><span>21:14</span><span>􀙇 􀛨 100%</span></div>
+            <div class="screen">
+              <div class="brandline">
+                <div>
+                  <div class="brand">Dart<span>Cool</span></div>
+                  <div class="sub">Trois joueurs au comptoir</div>
+                </div>
+                <div class="avatar">DD</div>
+              </div>
+
+              <div class="resume">
+                <div class="dotcol"></div>
+                <div>
+                  <div class="kicker">Partie en cours</div>
+                  <h3>501 · sortie double</h3>
+                  <p>Damien 81 · Léa 301 · Marc 221</p>
+                </div>
+                <div class="chevron">›</div>
+              </div>
+
+              <div class="sectitle">Formats</div>
+              <div class="grid">
+                <div class="mode hot">
+                  <div class="num">501</div>
+                  <div class="nm">Le classique</div>
+                  <div class="ds">Sortie double</div>
+                </div>
+                <div class="mode hot">
+                  <div class="num">301</div>
+                  <div class="nm">Format court</div>
+                  <div class="ds">Une manche</div>
+                </div>
+                <div class="mode">
+                  <div class="num">CR</div>
+                  <div class="nm">Cricket</div>
+                  <div class="ds">15 → 20 + bull</div>
+                </div>
+                <div class="mode">
+                  <div class="num">20</div>
+                  <div class="nm">Tour de cadran</div>
+                  <div class="ds">1 → 20 + bull</div>
+                </div>
+                <div class="mode">
+                  <div class="num">SH</div>
+                  <div class="nm">Shanghai</div>
+                  <div class="ds">7 tours</div>
+                </div>
+                <div class="mode">
+                  <div class="num">27</div>
+                  <div class="nm">Bob's 27</div>
+                  <div class="ds">Les doubles</div>
+                </div>
+              </div>
+
+              <div class="tabbar">
+                <div class="tab on"><i>◉</i>Jouer</div>
+                <div class="tab"><i>◎</i>Joueurs</div>
+                <div class="tab"><i>▦</i>Stats</div>
+                <div class="tab"><i>☰</i>Règles</div>
+              </div>
+            </div>
+          </div>
+          <figcaption><b>Accueil</b> — le verre ne sert qu'à deux choses : la reprise de partie et la barre d'onglets.</figcaption>
+        </figure>
+
+        <!-- PARTIE -->
+        <figure class="frame">
+          <div class="phone">
+            <div class="aura" style="background: #ffd0e2; top: 60px; right: -150px; opacity: 0.55"></div>
+            <div class="status"><span>21:16</span><span>􀙇 􀛨 100%</span></div>
+            <div class="screen">
+              <div class="mhead">
+                <div class="back">‹</div>
+                <div>
+                  <div class="mtitle">501 · sortie double</div>
+                  <div class="mmeta">Manche 1 · tour 3</div>
+                </div>
+                <div class="chevron" style="margin-left: auto">⋯</div>
+              </div>
+
+              <div class="hero">
+                <span class="tag">● Au lancer · Damien</span>
+                <div class="score">81<small>à faire</small></div>
+                <div class="out">
+                  <span class="lbl">Sortie</span>
+                  <span class="chip go">T19</span>
+                  <span class="chip go">D12</span>
+                  <span style="font-size: 12px; color: var(--ink-3); margin-left: 4px">2 fléchettes</span>
+                </div>
+              </div>
+
+              <div class="opp">
+                <span class="pip" style="background: #7fb3d5"></span>
+                <span class="nm">Léa</span>
+                <span style="font-size: 11.5px; color: var(--ink-3)">moy. 54,2</span>
+                <span class="sc">301</span>
+              </div>
+              <div class="opp">
+                <span class="pip" style="background: #e0a878"></span>
+                <span class="nm">Marc</span>
+                <span style="font-size: 11.5px; color: var(--ink-3)">moy. 61,0</span>
+                <span class="sc">221</span>
+              </div>
+
+              <div class="dock">
+                <div class="tray">
+                  <div class="slot done">T20</div>
+                  <div class="slot next">·</div>
+                  <div class="slot empty">·</div>
+                  <div class="undo">↺</div>
+                </div>
+                <div class="mult">
+                  <div class="mb on">SIMPLE</div>
+                  <div class="mb">DOUBLE</div>
+                  <div class="mb">TRIPLE</div>
+                </div>
+                <div class="keys">
+                  <div class="key">1</div><div class="key">2</div><div class="key">3</div><div class="key">4</div><div class="key">5</div>
+                  <div class="key">6</div><div class="key">7</div><div class="key">8</div><div class="key">9</div><div class="key">10</div>
+                  <div class="key">11</div><div class="key">12</div><div class="key">13</div><div class="key">14</div><div class="key">15</div>
+                  <div class="key">16</div><div class="key">17</div><div class="key">18</div><div class="key">19</div><div class="key">20</div>
+                  <div class="key wide">RATÉ</div><div class="key b25">25</div><div class="key bull" style="grid-column: span 2">BULL</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <figcaption><b>Partie</b> — le pavé flotte en verre au-dessus du score, qui reste lisible en défilant dessous.</figcaption>
+        </figure>
+
+        <figure class="frame">
+          <div class="phone">
+            <div class="aura" style="background: #ffd0e2; top: 300px; left: -120px; opacity: 0.5"></div>
+            <div class="aura" style="background: #d4ecdf; bottom: -60px; right: -130px; opacity: 0.4"></div>
+            <div class="status"><span>21:18</span><span>&#63879; &#63912; 100%</span></div>
+            <div class="screen">
+              <div class="mhead">
+                <div class="back">&lsaquo;</div>
+                <div>
+                  <div class="mtitle">501 &middot; sortie double</div>
+                  <div class="mmeta">Manche 1 &middot; tour 3</div>
+                </div>
+                <div class="chevron" style="margin-left: auto">&ctdot;</div>
+              </div>
+
+              <div class="hero" style="padding: 16px 20px 14px">
+                <span class="tag">&#9679; Au lancer &middot; Damien</span>
+                <div class="score" style="font-size: 76px">81<small>&agrave; faire</small></div>
+                <div class="out">
+                  <span class="lbl">Sortie</span>
+                  <span class="chip go">T19</span>
+                  <span class="chip go">D12</span>
+                </div>
+              </div>
+
+              <div class="seg">
+                <div>Pav&eacute;</div><div class="on">Cible</div><div>Total</div>
+              </div>
+
+              <div class="boardwrap">
+                <div class="tray" style="margin-bottom: 8px">
+                  <div class="slot done">T20</div>
+                  <div class="slot next">&middot;</div>
+                  <div class="slot empty">&middot;</div>
+                  <div class="undo">&#8634;</div>
+                </div>
+                <svg class="boardsvg" id="bd" viewBox="-124 -124 248 248" aria-label="Cible de fl&eacute;chettes"></svg>
+                <div class="legend">
+                  <span class="lg"><i style="background:#f7a9c4"></i>Anneau double</span>
+                  <span class="lg"><i style="background:#7fc4a6"></i>Anneau triple</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <figcaption><b>Saisie sur cible</b> &mdash; verre teint&eacute;, chiffres lisibles, anneaux color&eacute;s par r&ocirc;le. La cible 19 est en rose : c&rsquo;est la sortie conseill&eacute;e.</figcaption>
+        </figure>
+
+        <!-- RÉSUMÉ -->
+        <figure class="frame">
+          <div class="phone">
+            <div class="aura" style="background: #ffd6e5; top: -120px; left: -100px"></div>
+            <div class="status"><span>21:41</span><span>􀙇 􀛨 98%</span></div>
+            <div class="screen">
+              <div class="mhead">
+                <div class="back">‹</div>
+                <div>
+                  <div class="mtitle">Résultat</div>
+                  <div class="mmeta">501 · sortie double · 27 min</div>
+                </div>
+              </div>
+
+              <div class="winner">
+                <div class="aura" style="background: #ffc7dc; top: -170px; right: -120px; opacity: 0.6"></div>
+                <div class="cupline">Vainqueur</div>
+                <div class="wname">Damien</div>
+                <div class="wsub">sortie à 141 · 9 fléchettes</div>
+              </div>
+
+              <div class="rank">
+                <div class="rline"><span class="pos one">1</span><span class="nm">Damien</span><span class="vl">1 manche</span></div>
+                <div class="rline"><span class="pos">2</span><span class="nm">Marc</span><span class="vl">0 manche</span></div>
+                <div class="rline"><span class="pos">3</span><span class="nm">Léa</span><span class="vl">0 manche</span></div>
+              </div>
+
+              <div class="sectitle" style="padding-top: 4px">Damien</div>
+              <div class="tiles">
+                <div class="tile"><div class="k">Moy. / 3 fl.</div><div class="v">167,0</div></div>
+                <div class="tile"><div class="k">Meilleure volée</div><div class="v">180</div></div>
+                <div class="tile"><div class="k">Fléchettes</div><div class="v">9</div></div>
+                <div class="tile"><div class="k">180 / 140+</div><div class="v">2/3</div></div>
+                <div class="tile"><div class="k">% doubles</div><div class="v">100</div></div>
+                <div class="tile"><div class="k">Plus haute sortie</div><div class="v">141</div></div>
+              </div>
+
+              <div class="cta">
+                <div class="btn p">Revanche</div>
+                <div class="btn s">Terminer</div>
+              </div>
+              <div style="height: 20px"></div>
+            </div>
+          </div>
+          <figcaption><b>Résultat</b> — une seule couleur d'accent, les chiffres portent toute l'emphase.</figcaption>
+        </figure>
+      </div>
+
+      <div class="specs">
+        <div class="spec">
+          <h4>Palette</h4>
+          <div class="sw">
+            <i style="background: #f4f2ef"></i><i style="background: #fff"></i><i style="background: #17171c"></i>
+            <i style="background: #fff2f6"></i><i style="background: #ffdfe9"></i><i style="background: #f7a9c4"></i>
+            <i style="background: #d9507e"></i><i style="background: #5ca888"></i><i style="background: #d9696f"></i>
+          </div>
+          <p style="margin-top: 10px">
+            Porcelaine chaude, pas de blanc pur. Le rose est un <b>état</b> (joueur au lancer), jamais une décoration.
+            Vert et terre cuite restent pour la cible et les sorties.
+          </p>
+        </div>
+        <div class="spec">
+          <h4>Verre, deux usages</h4>
+          <p>
+            <code>blur(24px) saturate(150%)</code> sur <code>rgba(255,255,255,.72)</code>, filet blanc 1px.
+            Uniquement le dock de saisie et la barre d'onglets — là où du contenu passe réellement dessous.
+            Partout ailleurs : carte blanche opaque, ombre à deux couches.
+          </p>
+        </div>
+        <div class="spec">
+          <h4>Rayons hiérarchisés</h4>
+          <p>
+            Dock 34 · carte 22–28 · touche 16 · pilule 999. Un seul rayon partout, c'est la signature
+            du template. La hiérarchie des coins porte la hiérarchie de l'information.
+          </p>
+        </div>
+        <div class="spec">
+          <h4>La cible comme pav&eacute;</h4>
+          <p>
+            Anneau <b>rose = double</b>, anneau <b>vert = triple</b>, tout autour de la cible.
+            On n&rsquo;imite pas une vraie cible, on en fait un clavier : la main apprend o&ugrave; taper en deux parties.
+          </p>
+        </div>
+        <div class="spec">
+          <h4>Typographie</h4>
+          <p>
+            Chiffres en condensé (<code>Barlow Condensed</code> ou DIN système), interface en SF/Inter.
+            Le contraste large/étroit fait tout le caractère sportif sans un gramme de décoration.
+          </p>
+        </div>
+      </div>
+    </div>
+    <script>
+      (function () {
+        var S = [20,1,18,4,13,6,10,15,2,17,3,19,7,16,8,11,14,9,12,5];
+        var R = { num: 112, out: 100, dblIn: 86, trpOut: 60, trpIn: 48, bullOut: 14, bull: 7 };
+        var ns = "http://www.w3.org/2000/svg";
+        var el = document.getElementById("bd");
+        if (!el) return;
+        var rad = function (d) { return (d * Math.PI) / 180; };
+        var pt = function (r, a) { return [r * Math.cos(rad(a)), r * Math.sin(rad(a))]; };
+        var f = function (n) { return n.toFixed(2); };
+        function ring(r1, r2, a1, a2) {
+          var p1 = pt(r2, a1), p2 = pt(r2, a2), p3 = pt(r1, a2), p4 = pt(r1, a1);
+          return "M " + f(p1[0]) + " " + f(p1[1]) + " A " + r2 + " " + r2 + " 0 0 1 " + f(p2[0]) + " " + f(p2[1]) +
+                 " L " + f(p3[0]) + " " + f(p3[1]) + " A " + r1 + " " + r1 + " 0 0 0 " + f(p4[0]) + " " + f(p4[1]) + " Z";
+        }
+        function add(tag, attrs) {
+          var n = document.createElementNS(ns, tag);
+          for (var k in attrs) n.setAttribute(k, attrs[k]);
+          el.appendChild(n);
+          return n;
+        }
+        add("circle", { r: R.num + 10, fill: "rgba(255,255,255,0.55)" });
+        add("circle", { r: R.out + 7, fill: "rgba(23,23,28,0.045)" });
+        S.forEach(function (n, i) {
+          var a = -90 + i * 18, a1 = a - 9, a2 = a + 9;
+          var dark = i % 2 === 0;
+          var base = dark ? "rgba(234,228,219,0.92)" : "rgba(255,255,255,0.82)";
+          add("path", { d: ring(R.dblIn, R.out, a1, a2), fill: "rgba(247,169,196,0.85)" });
+          add("path", { d: ring(R.trpOut, R.dblIn, a1, a2), fill: base });
+          add("path", { d: ring(R.trpIn, R.trpOut, a1, a2), fill: "rgba(127,196,166,0.8)" });
+          add("path", { d: ring(R.bullOut, R.trpIn, a1, a2), fill: base });
+        });
+        S.forEach(function (n, i) {
+          var a = -90 + i * 18 - 9;
+          var p1 = pt(R.bullOut, a), p2 = pt(R.out, a);
+          add("path", { d: "M " + f(p1[0]) + " " + f(p1[1]) + " L " + f(p2[0]) + " " + f(p2[1]),
+                        stroke: "rgba(23,23,28,0.10)", "stroke-width": 0.8 });
+        });
+        add("circle", { r: R.bullOut, fill: "#7fc4a6" });
+        add("circle", { r: R.bull, fill: "#d9696f" });
+        S.forEach(function (n, i) {
+          var a = -90 + i * 18, p = pt(R.num, a);
+          var hot = n === 19;
+          var t = add("text", { x: f(p[0]), y: f(p[1] + 4.5), "text-anchor": "middle",
+            "font-family": "Barlow Condensed, sans-serif", "font-size": 15, "font-weight": 600,
+            fill: hot ? "#d9507e" : "#17171c" });
+          t.textContent = n;
+        });
+        var hit = pt((R.dblIn + R.out) / 2, -90 + 11 * 18);
+        add("circle", { cx: f(hit[0]), cy: f(hit[1]), r: 7, fill: "none",
+          stroke: "#d9507e", "stroke-width": 2, opacity: 0.9 });
+        add("circle", { cx: f(hit[0]), cy: f(hit[1]), r: 2.4, fill: "#d9507e" });
+      })();
+    </script>
+  </body>
+</html>

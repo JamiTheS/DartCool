@@ -110,7 +110,7 @@ export default function Setup() {
         onBack={() => router.back()}
         right={
           <Pressable onPress={() => setRules(true)} hitSlop={10} accessibilityLabel="Voir les règles">
-            <Text style={[T.label, { color: C.brass }]}>RÈGLES</Text>
+            <Text style={[T.label, { color: C.pink }]}>RÈGLES</Text>
           </Pressable>
         }
       />
@@ -127,8 +127,8 @@ export default function Setup() {
               </Label>
               {selected.length > 1 ? (
                 <Pressable onPress={shuffle} hitSlop={10} style={s.shuffle} accessibilityLabel="Mélanger l’ordre">
-                  <Shuffle size={16} color={C.chalkDim} />
-                  <Text style={[T.small, { color: C.chalkDim }]}>Mélanger</Text>
+                  <Shuffle size={16} color={C.ink2} />
+                  <Text style={[T.small, { color: C.ink2 }]}>Mélanger</Text>
                 </Pressable>
               ) : null}
             </View>
@@ -159,7 +159,7 @@ export default function Setup() {
                         <Text style={s.orderTxt}>{at + 1}</Text>
                       </View>
                     ) : null}
-                    <Text style={[T.bodyStrong, { color: on ? C.chalk : C.chalkDim }]}>{p.name}</Text>
+                    <Text style={[T.bodyStrong, { color: on ? C.ink : C.ink2 }]}>{p.name}</Text>
                   </Pressable>
                 );
               })}
@@ -170,7 +170,7 @@ export default function Setup() {
                 value={name}
                 onChangeText={setName}
                 placeholder="Nouveau joueur"
-                placeholderTextColor={C.chalkFaint}
+                placeholderTextColor={C.ink3}
                 style={s.input}
                 maxLength={18}
                 returnKeyType="done"
@@ -178,22 +178,22 @@ export default function Setup() {
                 autoCorrect={false}
               />
               <Pressable onPress={add} style={s.addBtn} accessibilityLabel="Ajouter le joueur">
-                <Plus color={C.onBrass} />
+                <Plus color={C.onPink} />
               </Pressable>
             </View>
 
             {selected.length > 1 ? (
-              <Text style={[T.small, { marginTop: SP.sm, color: C.chalkFaint }]}>
+              <Text style={[T.small, { marginTop: SP.sm, color: C.ink3 }]}>
                 Ordre de lancer : {selected.map((id) => players.find((p) => p.id === id)?.name).join(' → ')}
               </Text>
             ) : null}
             {tooMany ? (
-              <Text style={[T.small, { marginTop: 6, color: C.red }]}>
+              <Text style={[T.small, { marginTop: 6, color: C.danger }]}>
                 {mode.name} se joue à {mode.maxPlayers} joueurs au maximum.
               </Text>
             ) : null}
             {!mode.solo && selected.length < 2 ? (
-              <Text style={[T.small, { marginTop: 6, color: C.red }]}>
+              <Text style={[T.small, { marginTop: 6, color: C.danger }]}>
                 Ce mode demande au moins deux joueurs.
               </Text>
             ) : null}
@@ -210,8 +210,8 @@ export default function Setup() {
                   }}
                   hitSlop={10}
                   style={s.shuffle}>
-                  <Shuffle size={16} color={C.chalkDim} />
-                  <Text style={[T.small, { color: C.chalkDim }]}>Retirer au sort</Text>
+                  <Shuffle size={16} color={C.ink2} />
+                  <Text style={[T.small, { color: C.ink2 }]}>Retirer au sort</Text>
                 </Pressable>
               </View>
               {selected.map((id, i) => {
@@ -294,18 +294,18 @@ export default function Setup() {
             </Card>
           ) : null}
 
-          <Card tone={C.brass}>
+          <Card tone={C.pink}>
             <Label>En bref</Label>
-            <Text style={[T.body, { marginTop: 4, color: C.chalk }]}>{mode.tagline}</Text>
+            <Text style={[T.body, { marginTop: 4, color: C.ink }]}>{mode.tagline}</Text>
             <Divider style={{ marginVertical: SP.sm }} />
             <Text style={T.small}>{mode.rules[0]}</Text>
             <Pressable onPress={() => setRules(true)} style={{ marginTop: SP.sm }}>
-              <Text style={[T.small, { color: C.brass, fontWeight: '700' }]}>Lire toutes les règles →</Text>
+              <Text style={[T.small, { color: C.pink, fontWeight: '700' }]}>Lire toutes les règles →</Text>
             </Pressable>
           </Card>
 
           {current && !current.finishedAt ? (
-            <Text style={[T.small, { color: C.chalkFaint, textAlign: 'center' }]}>
+            <Text style={[T.small, { color: C.ink3, textAlign: 'center' }]}>
               Une partie est en cours ({current.title}) : la lancer ici l’abandonnera.
             </Text>
           ) : null}
@@ -319,8 +319,8 @@ export default function Setup() {
       <Sheet visible={rules} onClose={() => setRules(false)} title={`Règles · ${mode.name}`}>
         {mode.rules.map((r, i) => (
           <View key={i} style={{ flexDirection: 'row', marginBottom: SP.sm }}>
-            <Text style={[T.num, { color: C.brass, width: 22 }]}>{i + 1}</Text>
-            <Text style={[T.body, { flex: 1, color: C.chalk }]}>{r}</Text>
+            <Text style={[T.num, { color: C.pink, width: 22 }]}>{i + 1}</Text>
+            <Text style={[T.body, { flex: 1, color: C.ink }]}>{r}</Text>
           </View>
         ))}
       </Sheet>
@@ -342,24 +342,24 @@ const s = StyleSheet.create({
     paddingVertical: 9,
   },
   order: { width: 18, height: 18, borderRadius: 9, alignItems: 'center', justifyContent: 'center' },
-  orderTxt: { fontSize: 11, fontWeight: '800', color: C.onBrass },
+  orderTxt: { fontSize: 11, fontWeight: '800', color: C.onPink },
   addRow: { flexDirection: 'row', gap: SP.xs, marginTop: SP.sm },
   input: {
     flex: 1,
-    backgroundColor: C.panelHigh,
+    backgroundColor: C.cardHi,
     borderRadius: R.sm,
     borderWidth: 1,
     borderColor: C.line,
     paddingHorizontal: SP.md,
     height: 48,
-    color: C.chalk,
+    color: C.ink,
     fontSize: 16,
   },
   addBtn: {
     width: 48,
     height: 48,
     borderRadius: R.sm,
-    backgroundColor: C.brass,
+    backgroundColor: C.pink,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -371,6 +371,6 @@ const s = StyleSheet.create({
     paddingBottom: SP.sm,
     borderTopWidth: 1,
     borderTopColor: C.line,
-    backgroundColor: C.base,
+    backgroundColor: C.bg,
   },
 });

@@ -68,7 +68,7 @@ export default function Rules() {
                   }}
                   style={({ pressed }) => [
                     s.modeCard,
-                    { backgroundColor: pressed ? C.panelHigher : C.panel, borderColor: isOpen ? alpha(C.brass, 0.4) : C.line },
+                    { backgroundColor: pressed ? C.cardHi2 : C.card, borderColor: isOpen ? alpha(C.pink, 0.4) : C.line },
                   ]}>
                   <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                     <View style={{ flex: 1 }}>
@@ -76,7 +76,7 @@ export default function Rules() {
                       <Text style={[T.small, { marginTop: 1 }]}>{m.tagline}</Text>
                     </View>
                     <View style={{ transform: [{ rotate: isOpen ? '90deg' : '0deg' }] }}>
-                      <ChevronRight size={18} color={C.chalkFaint} />
+                      <ChevronRight size={18} color={C.ink3} />
                     </View>
                   </View>
                   {isOpen ? (
@@ -84,11 +84,11 @@ export default function Rules() {
                       <Divider style={{ marginBottom: SP.sm }} />
                       {m.rules.map((r, i) => (
                         <View key={i} style={{ flexDirection: 'row', marginBottom: 8 }}>
-                          <Text style={[T.num, { color: C.brass, width: 20, fontSize: 15 }]}>{i + 1}</Text>
-                          <Text style={[T.body, { flex: 1, color: C.chalk }]}>{r}</Text>
+                          <Text style={[T.num, { color: C.pink, width: 20, fontSize: 15 }]}>{i + 1}</Text>
+                          <Text style={[T.body, { flex: 1, color: C.ink }]}>{r}</Text>
                         </View>
                       ))}
-                      <Text style={[T.small, { color: C.chalkFaint, marginTop: 4 }]}>
+                      <Text style={[T.small, { color: C.ink3, marginTop: 4 }]}>
                         {m.minPlayers === 1 ? 'Jouable en solo' : `${m.minPlayers} joueurs minimum`} ·{' '}
                         {m.maxPlayers} au maximum
                       </Text>
@@ -110,7 +110,7 @@ export default function Rules() {
 
         {tab === 'sorties' ? (
           <View>
-            <Card tone={C.green}>
+            <Card tone={C.ok}>
               <Label>Table des sorties</Label>
               <Text style={[T.small, { marginTop: 4 }]}>
                 Reste par reste, le chemin conseillé en sortie double, de 170 (la plus haute sortie
@@ -120,8 +120,8 @@ export default function Rules() {
             <View style={{ marginTop: SP.sm }}>
               {outs.map((o) => (
                 <View key={o.n} style={s.outRow}>
-                  <Text style={[T.num, { width: 44, color: C.brass }]}>{o.n}</Text>
-                  <Text style={[T.body, { color: C.chalk, flex: 1 }]}>{o.path.join('  ·  ')}</Text>
+                  <Text style={[T.num, { width: 44, color: C.pink }]}>{o.n}</Text>
+                  <Text style={[T.body, { color: C.ink, flex: 1 }]}>{o.path.join('  ·  ')}</Text>
                   <Text style={[T.label, { width: 30, textAlign: 'right' }]}>
                     {o.path.length} fl
                   </Text>

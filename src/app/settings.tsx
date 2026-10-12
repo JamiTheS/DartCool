@@ -73,12 +73,12 @@ export default function SettingsScreen() {
           <Label>À propos</Label>
           <Pressable style={s.row} onPress={() => router.push('/privacy')}>
             <Text style={[T.bodyStrong, { flex: 1 }]}>Confidentialité</Text>
-            <ChevronRight size={18} color={C.chalkFaint} />
+            <ChevronRight size={18} color={C.ink3} />
           </Pressable>
           <Divider />
           <Pressable style={s.row} onPress={() => openUrl(LINKS.supportUrl)}>
             <Text style={[T.bodyStrong, { flex: 1 }]}>Aide et contact</Text>
-            <ChevronRight size={18} color={C.chalkFaint} />
+            <ChevronRight size={18} color={C.ink3} />
           </Pressable>
           <Divider />
           <Pressable style={s.row} onPress={() => openUrl(`mailto:${LINKS.supportEmail}`)}>
@@ -107,7 +107,7 @@ export default function SettingsScreen() {
           />
         </Card>
 
-        <Text style={[T.small, { textAlign: 'center', color: C.chalkFaint, marginTop: SP.sm }]}>
+        <Text style={[T.small, { textAlign: 'center', color: C.ink3, marginTop: SP.sm }]}>
           DartCool · fait pour les soirées fléchettes
         </Text>
       </ScrollView>

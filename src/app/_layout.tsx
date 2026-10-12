@@ -29,7 +29,7 @@ function Gate({ children }: { children: React.ReactNode }) {
     return () => clearTimeout(t);
   }, []);
 
-  if (!ready) return <View style={{ flex: 1, backgroundColor: C.base }} />;
+  if (!ready) return <View style={{ flex: 1, backgroundColor: C.bg }} />;
   return <>{children}</>;
 }
 
@@ -37,12 +37,12 @@ export default function RootLayout() {
   return (
     <SafeAreaProvider>
       <AppProvider>
-        <StatusBar style="light" />
+        <StatusBar style="dark" />
         <Gate>
           <Stack
             screenOptions={{
               headerShown: false,
-              contentStyle: { backgroundColor: C.base },
+              contentStyle: { backgroundColor: C.bg },
               animation: 'slide_from_right',
             }}>
             <Stack.Screen name="index" options={{ animation: 'fade' }} />

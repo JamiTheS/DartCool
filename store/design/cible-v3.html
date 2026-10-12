@@ -1,0 +1,433 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>DartCool — la cible comme interface</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet" />
+    <style>
+      :root {
+        --bg: #f5f4f7;
+        --card: #ffffff;
+        --ink: #16161c;
+        --ink-2: #6c6c78;
+        --ink-3: #a6a6b2;
+        --pink: #ff9ec4;
+        --pink-ink: #d8528c;
+        --pink-soft: #ffeef5;
+        --peach: #ffc08a;
+        --peach-ink: #cf8339;
+        --mark: #ff3b3b;
+        --glass: rgba(255, 255, 255, 0.72);
+        --sh-1: 0 1px 2px rgba(22, 22, 28, 0.05);
+        --sh-2: 0 2px 6px rgba(22, 22, 28, 0.05), 0 16px 38px -14px rgba(22, 22, 28, 0.16);
+        --fd: "Barlow Condensed", "DIN Condensed", sans-serif;
+        --fu: "Inter", -apple-system, system-ui, sans-serif;
+      }
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      body { font-family: var(--fu); background: #e9e7ec; color: var(--ink); padding: 48px 24px 72px; -webkit-font-smoothing: antialiased; }
+      .page { max-width: 1240px; margin: 0 auto; }
+      .lede { max-width: 620px; margin-bottom: 36px; }
+      .lede h1 { font-family: var(--fd); font-size: 50px; font-weight: 700; line-height: 1; }
+      .lede h1 em { font-style: normal; color: var(--pink-ink); }
+      .lede p { color: var(--ink-2); font-size: 15.5px; line-height: 1.65; margin-top: 10px; }
+      .hint { display: inline-flex; align-items: center; gap: 8px; margin-top: 14px; font-size: 13px; font-weight: 500; color: var(--pink-ink); background: var(--pink-soft); padding: 8px 14px; border-radius: 999px; }
+      .row { display: flex; gap: 32px; flex-wrap: wrap; align-items: flex-start; }
+      .frame { width: 360px; }
+      .frame figcaption { font-size: 13px; color: var(--ink-2); margin-top: 13px; line-height: 1.5; }
+      .frame figcaption b { color: var(--ink); font-weight: 600; }
+      .phone { position: relative; width: 360px; height: 780px; border-radius: 48px; background: var(--bg); box-shadow: var(--sh-2), 0 0 0 1px rgba(22,22,28,0.06); overflow: hidden; display: flex; flex-direction: column; }
+      .aura { position: absolute; border-radius: 50%; filter: blur(64px); pointer-events: none; }
+      .status { height: 48px; display: flex; align-items: flex-end; justify-content: space-between; padding: 0 28px 7px; font-size: 13px; font-weight: 600; position: relative; z-index: 2; }
+      .screen { flex: 1; position: relative; z-index: 2; display: flex; flex-direction: column; min-height: 0; }
+
+      .top { display: flex; align-items: center; gap: 12px; padding: 4px 20px 10px; }
+      .back { width: 34px; height: 34px; border-radius: 50%; background: var(--card); box-shadow: var(--sh-1); display: grid; place-items: center; color: var(--ink-2); font-size: 16px; }
+      .ttl { font-size: 14.5px; font-weight: 600; }
+      .mta { font-size: 11.5px; color: var(--ink-3); }
+
+      .hero { padding: 2px 24px 10px; display: flex; align-items: flex-end; justify-content: space-between; }
+      .who { display: flex; align-items: center; gap: 9px; }
+      .pip { width: 10px; height: 10px; border-radius: 50%; background: var(--pink); }
+      .nameline { font-size: 17px; font-weight: 600; letter-spacing: -0.1px; }
+      .kick { font-size: 10.5px; letter-spacing: 1.3px; text-transform: uppercase; color: var(--ink-3); font-weight: 600; }
+      .big { font-family: var(--fd); font-size: 84px; font-weight: 700; line-height: 0.82; letter-spacing: -1px; }
+      .big small { font-family: var(--fu); font-size: 12px; font-weight: 500; color: var(--ink-3); letter-spacing: 0; display: block; text-align: right; margin-top: 5px; }
+
+      .outrow { display: flex; align-items: center; gap: 6px; padding: 0 24px 10px; min-height: 28px; }
+      .lbl { font-size: 10.5px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--ink-3); font-weight: 600; }
+      .chip { font-family: var(--fd); font-size: 17px; font-weight: 600; letter-spacing: 0.4px; padding: 3px 10px; border-radius: 9px; background: var(--pink-soft); color: var(--pink-ink); }
+
+      .boardbox { padding: 0 10px; }
+      .boardsvg { display: block; width: 100%; height: auto; cursor: crosshair; }
+
+      .tray { display: flex; gap: 8px; align-items: center; padding: 10px 18px 0; }
+      .slot { flex: 1; height: 52px; border-radius: 16px; display: grid; place-items: center; font-family: var(--fd); font-size: 23px; font-weight: 600; background: var(--card); box-shadow: var(--sh-1); color: var(--ink-3); transition: all 0.18s ease; }
+      .slot.filled { background: var(--ink); color: #fff; }
+      .slot.next { box-shadow: inset 0 0 0 2px var(--pink); color: var(--pink-ink); }
+      .undo { width: 52px; height: 52px; border-radius: 16px; background: var(--card); box-shadow: var(--sh-1); display: grid; place-items: center; color: var(--ink-2); font-size: 18px; cursor: pointer; }
+      .undo:active { transform: scale(0.95); }
+
+      .others { display: flex; gap: 8px; padding: 10px 18px 0; }
+      .oth { flex: 1; background: var(--card); border-radius: 16px; box-shadow: var(--sh-1); padding: 9px 12px; }
+      .oth .n { font-size: 12px; color: var(--ink-2); font-weight: 500; }
+      .oth .s { font-family: var(--fd); font-size: 24px; font-weight: 600; margin-top: -1px; }
+
+      .seg { display: flex; gap: 5px; margin: auto 18px 16px; padding: 4px; background: var(--glass); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-radius: 17px; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.9), var(--sh-1); }
+      .seg div { flex: 1; height: 36px; border-radius: 13px; display: grid; place-items: center; font-size: 12.5px; font-weight: 600; color: var(--ink-2); cursor: pointer; }
+      .seg div.on { background: #fff; color: var(--ink); box-shadow: var(--sh-1); }
+
+      .brandline { display: flex; align-items: center; justify-content: space-between; padding: 8px 22px 16px; }
+      .brand { font-family: var(--fd); font-size: 33px; font-weight: 700; line-height: 1; }
+      .brand span { color: var(--pink-ink); }
+      .sub { font-size: 12px; color: var(--ink-3); margin-top: 1px; }
+      .avatar { width: 38px; height: 38px; border-radius: 50%; background: var(--card); box-shadow: var(--sh-1); display: grid; place-items: center; font-size: 12.5px; font-weight: 600; color: var(--ink-2); }
+      .resume { margin: 0 18px 20px; padding: 15px 17px; border-radius: 24px; background: var(--glass); backdrop-filter: blur(22px) saturate(140%); -webkit-backdrop-filter: blur(22px) saturate(140%); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.9), var(--sh-2); display: flex; align-items: center; gap: 13px; }
+      .resume .bar { width: 3px; height: 38px; border-radius: 2px; background: var(--pink); }
+      .resume h3 { font-size: 15.5px; font-weight: 600; margin-top: 2px; }
+      .resume p { font-size: 12px; color: var(--ink-2); margin-top: 1px; }
+      .sect { font-size: 10.5px; letter-spacing: 1.4px; text-transform: uppercase; color: var(--ink-3); font-weight: 600; padding: 0 22px 9px; }
+      .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; padding: 0 18px; }
+      .mode { background: var(--card); border-radius: 22px; padding: 14px 15px 13px; box-shadow: var(--sh-1); }
+      .mode .num { font-family: var(--fd); font-size: 34px; font-weight: 600; line-height: 0.95; }
+      .mode.hot { background: linear-gradient(180deg, #fff4f9 0%, #fff 60%); box-shadow: var(--sh-1), 0 0 0 1px #ffe2ee; }
+      .mode.hot .num { color: var(--pink-ink); }
+      .mode .nm { font-size: 13px; font-weight: 600; margin-top: 7px; }
+      .mode .ds { font-size: 11px; color: var(--ink-3); }
+      .tabbar { margin: auto 14px 14px; height: 62px; border-radius: 31px; background: var(--glass); backdrop-filter: blur(24px) saturate(150%); -webkit-backdrop-filter: blur(24px) saturate(150%); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.9), var(--sh-2); display: grid; grid-template-columns: repeat(4, 1fr); align-items: center; }
+      .tab { text-align: center; font-size: 10px; color: var(--ink-3); font-weight: 500; }
+      .tab i { display: block; font-style: normal; font-size: 16px; margin-bottom: 3px; }
+      .tab.on { color: var(--pink-ink); }
+
+      .winner { margin: 2px 18px 14px; padding: 24px 20px 20px; border-radius: 28px; background: linear-gradient(180deg, #fff3f8 0%, #fff 70%); box-shadow: var(--sh-2); text-align: center; position: relative; overflow: hidden; }
+      .wname { font-family: var(--fd); font-size: 42px; font-weight: 700; line-height: 1; margin-top: 5px; }
+      .wsub { font-size: 12.5px; color: var(--ink-2); margin-top: 5px; }
+      .rank { margin: 0 18px 12px; padding: 2px 16px; background: var(--card); border-radius: 20px; box-shadow: var(--sh-1); }
+      .rl { display: flex; align-items: center; gap: 12px; padding: 11px 0; border-bottom: 1px solid rgba(22,22,28,0.06); }
+      .rl:last-child { border-bottom: 0; }
+      .rl .p { font-family: var(--fd); font-size: 18px; width: 14px; color: var(--ink-3); }
+      .rl .p.one { color: var(--pink-ink); }
+      .rl .n { flex: 1; font-size: 13.5px; font-weight: 500; }
+      .rl .v { font-size: 12.5px; color: var(--ink-2); }
+      .tiles { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; padding: 0 18px; }
+      .tile { background: var(--card); border-radius: 18px; padding: 11px; box-shadow: var(--sh-1); }
+      .tile .k { font-size: 9px; letter-spacing: 0.8px; text-transform: uppercase; color: var(--ink-3); font-weight: 600; }
+      .tile .v { font-family: var(--fd); font-size: 26px; font-weight: 600; margin-top: 2px; }
+      .cta { margin: 16px 18px 0; display: flex; gap: 8px; }
+      .btn { flex: 1; height: 52px; border-radius: 18px; display: grid; place-items: center; font-size: 14px; font-weight: 600; }
+      .btn.p { background: var(--ink); color: #fff; }
+      .btn.s { background: #fff; color: var(--ink); box-shadow: var(--sh-1); }
+      .flash { position: absolute; left: 0; right: 0; bottom: 96px; text-align: center; font-size: 13px; font-weight: 600; color: var(--pink-ink); opacity: 0; transition: opacity 0.25s; pointer-events: none; }
+      .flash.show { opacity: 1; }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <div class="lede">
+        <h1>La cible <em>est</em> l'interface.</h1>
+        <p>
+          L'app reste blanche et claire ; la cible est le seul objet dense de l'écran. Trois fléchettes,
+          trois marques, au suivant.
+        </p>
+        <div class="hint">Clique dans la cible pour essayer — doubles, triples, bull, hors cible</div>
+      </div>
+
+      <div class="row">
+        <figure class="frame">
+          <div class="phone">
+            <div class="aura" style="background: #ffd9e8; width: 360px; height: 360px; top: 180px; left: -130px; opacity: 0.55"></div>
+            <div class="aura" style="background: #ffe6cc; width: 320px; height: 320px; bottom: 40px; right: -120px; opacity: 0.5"></div>
+            <div class="status"><span>21:16</span><span>&#9679;&#9679;&#9679; 100%</span></div>
+            <div class="screen">
+              <div class="top">
+                <div class="back">&lsaquo;</div>
+                <div>
+                  <div class="ttl">501 &middot; sortie double</div>
+                  <div class="mta">Manche 1 &middot; tour 3</div>
+                </div>
+                <div style="margin-left: auto; color: var(--ink-3); font-size: 19px">&ctdot;</div>
+              </div>
+
+              <div class="hero">
+                <div>
+                  <div class="kick">Au lancer</div>
+                  <div class="who" style="margin-top: 3px">
+                    <span class="pip" id="pip"></span><span class="nameline" id="pname">Damien</span>
+                  </div>
+                </div>
+                <div style="text-align: right">
+                  <div class="big" id="pscore">141</div>
+                  <small style="font-family: var(--fu); font-size: 11.5px; color: var(--ink-3)">à faire</small>
+                </div>
+              </div>
+
+              <div class="outrow" id="outrow">
+                <span class="lbl">Sortie</span>
+                <span class="chip">T20</span><span class="chip">T19</span><span class="chip">D12</span>
+              </div>
+
+              <div class="boardbox">
+                <svg class="boardsvg" id="board" viewBox="-132 -132 264 264" aria-label="Cible interactive"></svg>
+              </div>
+
+              <div class="tray">
+                <div class="slot next" id="s0">&middot;</div>
+                <div class="slot" id="s1">&middot;</div>
+                <div class="slot" id="s2">&middot;</div>
+                <div class="undo" id="undo">&#8634;</div>
+              </div>
+
+              <div class="others">
+                <div class="oth"><div class="n">L&eacute;a</div><div class="s">301</div></div>
+                <div class="oth"><div class="n">Marc</div><div class="s">221</div></div>
+              </div>
+
+              <div class="flash" id="flash">Au suivant &middot; L&eacute;a</div>
+
+              <div class="seg">
+                <div class="on">Cible</div><div>Pav&eacute;</div><div>Total</div>
+              </div>
+            </div>
+          </div>
+          <figcaption><b>Partie</b> &mdash; la cible occupe la moiti&eacute; de l&rsquo;&eacute;cran. Chaque appui laisse une marque rouge &agrave; l&rsquo;endroit exact, la troisi&egrave;me passe la main.</figcaption>
+        </figure>
+
+        <figure class="frame">
+          <div class="phone">
+            <div class="aura" style="background: #ffd9e8; width: 380px; height: 380px; top: -130px; right: -130px; opacity: 0.5"></div>
+            <div class="aura" style="background: #ffe6cc; width: 300px; height: 300px; bottom: 150px; left: -140px; opacity: 0.45"></div>
+            <div class="status"><span>21:14</span><span>&#9679;&#9679;&#9679; 100%</span></div>
+            <div class="screen">
+              <div class="brandline">
+                <div>
+                  <div class="brand">Dart<span>Cool</span></div>
+                  <div class="sub">Trois joueurs au comptoir</div>
+                </div>
+                <div class="avatar">DD</div>
+              </div>
+              <div class="resume">
+                <div class="bar"></div>
+                <div>
+                  <div class="kick" style="color: var(--pink-ink)">Partie en cours</div>
+                  <h3>501 &middot; sortie double</h3>
+                  <p>Damien 141 &middot; L&eacute;a 301 &middot; Marc 221</p>
+                </div>
+                <div style="margin-left: auto; color: var(--ink-3); font-size: 19px">&rsaquo;</div>
+              </div>
+              <div class="sect">Formats</div>
+              <div class="grid">
+                <div class="mode hot"><div class="num">501</div><div class="nm">Le classique</div><div class="ds">Sortie double</div></div>
+                <div class="mode hot"><div class="num">301</div><div class="nm">Format court</div><div class="ds">Une manche</div></div>
+                <div class="mode"><div class="num">CR</div><div class="nm">Cricket</div><div class="ds">15 &rarr; 20 + bull</div></div>
+                <div class="mode"><div class="num">20</div><div class="nm">Tour de cadran</div><div class="ds">1 &rarr; 20 + bull</div></div>
+                <div class="mode"><div class="num">SH</div><div class="nm">Shanghai</div><div class="ds">7 tours</div></div>
+                <div class="mode"><div class="num">27</div><div class="nm">Bob&rsquo;s 27</div><div class="ds">Les doubles</div></div>
+              </div>
+              <div class="tabbar">
+                <div class="tab on"><i>&#9673;</i>Jouer</div>
+                <div class="tab"><i>&#9678;</i>Joueurs</div>
+                <div class="tab"><i>&#9638;</i>Stats</div>
+                <div class="tab"><i>&#9776;</i>R&egrave;gles</div>
+              </div>
+            </div>
+          </div>
+          <figcaption><b>Accueil</b> &mdash; m&ecirc;me verre, m&ecirc;me rose, m&ecirc;me p&ecirc;che. Les chiffres des formats reprennent la typo de la cible.</figcaption>
+        </figure>
+
+        <figure class="frame">
+          <div class="phone">
+            <div class="aura" style="background: #ffd9e8; width: 360px; height: 360px; top: -120px; left: -110px; opacity: 0.5"></div>
+            <div class="status"><span>21:41</span><span>&#9679;&#9679;&#9679; 98%</span></div>
+            <div class="screen">
+              <div class="top">
+                <div class="back">&lsaquo;</div>
+                <div><div class="ttl">R&eacute;sultat</div><div class="mta">501 &middot; sortie double &middot; 27 min</div></div>
+              </div>
+              <div class="winner">
+                <div class="kick" style="color: var(--pink-ink)">Vainqueur</div>
+                <div class="wname">Damien</div>
+                <div class="wsub">sortie &agrave; 141 &middot; 9 fl&eacute;chettes</div>
+                <svg width="150" height="150" viewBox="-132 -132 264 264" style="position: absolute; right: -44px; bottom: -48px; opacity: 0.16" id="mini"></svg>
+              </div>
+              <div class="rank">
+                <div class="rl"><span class="p one">1</span><span class="n">Damien</span><span class="v">1 manche</span></div>
+                <div class="rl"><span class="p">2</span><span class="n">Marc</span><span class="v">0 manche</span></div>
+                <div class="rl"><span class="p">3</span><span class="n">L&eacute;a</span><span class="v">0 manche</span></div>
+              </div>
+              <div class="sect" style="padding-top: 2px">Damien</div>
+              <div class="tiles">
+                <div class="tile"><div class="k">Moy. / 3 fl.</div><div class="v">167,0</div></div>
+                <div class="tile"><div class="k">Meilleure vol&eacute;e</div><div class="v">180</div></div>
+                <div class="tile"><div class="k">Fl&eacute;chettes</div><div class="v">9</div></div>
+                <div class="tile"><div class="k">180 / 140+</div><div class="v">2/3</div></div>
+                <div class="tile"><div class="k">% doubles</div><div class="v">100</div></div>
+                <div class="tile"><div class="k">Haute sortie</div><div class="v">141</div></div>
+              </div>
+              <div class="cta"><div class="btn p">Revanche</div><div class="btn s">Terminer</div></div>
+              <div style="height: 18px"></div>
+            </div>
+          </div>
+          <figcaption><b>R&eacute;sultat</b> &mdash; la cible revient en filigrane, assez pr&eacute;sente pour signer l&rsquo;&eacute;cran, assez discr&egrave;te pour laisser lire les chiffres.</figcaption>
+        </figure>
+      </div>
+    </div>
+
+    <script>
+      (function () {
+        var S = [20,1,18,4,13,6,10,15,2,17,3,19,7,16,8,11,14,9,12,5];
+        var R = { bezelOut: 130, bezelIn: 115, rimIn: 99, dblIn: 82, trpOut: 60, trpIn: 43, bullOut: 13, bull: 6.5 };
+        var NS = "http://www.w3.org/2000/svg";
+        var rad = function (d) { return (d * Math.PI) / 180; };
+        var pt = function (r, a) { return [r * Math.cos(rad(a)), r * Math.sin(rad(a))]; };
+        var f = function (n) { return n.toFixed(2); };
+        function ringPath(r1, r2, a1, a2) {
+          var p1 = pt(r2, a1), p2 = pt(r2, a2), p3 = pt(r1, a2), p4 = pt(r1, a1);
+          return "M " + f(p1[0]) + " " + f(p1[1]) + " A " + r2 + " " + r2 + " 0 0 1 " + f(p2[0]) + " " + f(p2[1]) +
+            " L " + f(p3[0]) + " " + f(p3[1]) + " A " + r1 + " " + r1 + " 0 0 0 " + f(p4[0]) + " " + f(p4[1]) + " Z";
+        }
+        function build(svg, interactive) {
+          var mk = function (tag, attrs, parent) {
+            var n = document.createElementNS(NS, tag);
+            for (var k in attrs) n.setAttribute(k, attrs[k]);
+            (parent || svg).appendChild(n);
+            return n;
+          };
+          var defs = mk("defs", {});
+          var bez = mk("linearGradient", { id: svg.id + "bz", x1: "0", y1: "0", x2: "1", y2: "1" }, defs);
+          [["0%", "#eaf1ff"], ["22%", "#ffffff"], ["45%", "#ffe3c2"], ["62%", "#ffffff"], ["80%", "#dbe8ff"], ["100%", "#ffffff"]]
+            .forEach(function (s) { mk("stop", { offset: s[0], "stop-color": s[1] }, bez); });
+          var gl = mk("radialGradient", { id: svg.id + "gl", cx: "38%", cy: "26%", r: "72%" }, defs);
+          mk("stop", { offset: "0%", "stop-color": "#ffffff", "stop-opacity": "0.55" }, gl);
+          mk("stop", { offset: "55%", "stop-color": "#ffffff", "stop-opacity": "0.06" }, gl);
+          mk("stop", { offset: "100%", "stop-color": "#ffffff", "stop-opacity": "0" }, gl);
+
+          mk("circle", { r: R.bezelOut, fill: "url(#" + svg.id + "bz)", opacity: "0.9" });
+          mk("circle", { r: R.bezelIn + 1, fill: "#1b1b22", opacity: "0.92" });
+          S.forEach(function (n, i) {
+            var a = -90 + i * 18, a1 = a - 9, a2 = a + 9;
+            var dark = i % 2 === 0;
+            var body = dark ? "rgba(22,22,28,0.92)" : "rgba(226,226,236,0.78)";
+            var ring = dark ? "#ff9ec4" : "#ffc08a";
+            mk("path", { d: ringPath(R.dblIn, R.rimIn, a1, a2), fill: ring, "data-r": "d", "data-n": n });
+            mk("path", { d: ringPath(R.trpOut, R.dblIn, a1, a2), fill: body, "data-r": "s", "data-n": n });
+            mk("path", { d: ringPath(R.trpIn, R.trpOut, a1, a2), fill: ring, "data-r": "t", "data-n": n });
+            mk("path", { d: ringPath(R.bullOut, R.trpIn, a1, a2), fill: body, "data-r": "s", "data-n": n });
+          });
+          S.forEach(function (n, i) {
+            var a = -90 + i * 18 - 9;
+            var p1 = pt(R.bullOut, a), p2 = pt(R.rimIn, a);
+            mk("path", { d: "M " + f(p1[0]) + " " + f(p1[1]) + " L " + f(p2[0]) + " " + f(p2[1]),
+              stroke: "rgba(255,255,255,0.22)", "stroke-width": 0.7 });
+          });
+          mk("circle", { r: R.bullOut, fill: "#ffc08a" });
+          mk("circle", { r: R.bull, fill: "#ff9ec4" });
+          S.forEach(function (n, i) {
+            var a = -90 + i * 18, p = pt((R.rimIn + R.bezelIn) / 2 + 1, a);
+            var t = mk("text", { x: f(p[0]), y: f(p[1] + 4.6), "text-anchor": "middle", fill: "#ffffff",
+              "font-family": "Barlow Condensed, sans-serif", "font-size": 14, "font-weight": 600, "pointer-events": "none" });
+            t.textContent = n;
+          });
+          mk("circle", { r: R.bezelOut - 1, fill: "url(#" + svg.id + "gl)", "pointer-events": "none" });
+          if (interactive) mk("g", { id: "marks" });
+          return svg;
+        }
+
+        var board = document.getElementById("board");
+        build(board, true);
+        var mini = document.getElementById("mini");
+        if (mini) { mini.id = "mini"; build(mini, false); }
+
+        var marks = board.querySelector("#marks");
+        var players = [
+          { n: "Damien", s: 141, c: "#ff9ec4" },
+          { n: "Léa", s: 301, c: "#8fc4e8" },
+          { n: "Marc", s: 221, c: "#f0b27a" }
+        ];
+        var cur = 0, darts = [];
+        var $ = function (id) { return document.getElementById(id); };
+
+        function label(n, ring) {
+          if (n === 0) return "—";
+          if (n === 25) return ring === "t" ? "BULL" : "25";
+          return (ring === "d" ? "D" : ring === "t" ? "T" : "") + n;
+        }
+        function value(n, ring) {
+          if (n === 0) return 0;
+          if (n === 25) return ring === "t" ? 50 : 25;
+          return n * (ring === "d" ? 2 : ring === "t" ? 3 : 1);
+        }
+        function render() {
+          var p = players[cur];
+          $("pname").textContent = p.n;
+          $("pscore").textContent = p.s;
+          $("pip").style.background = p.c;
+          for (var i = 0; i < 3; i++) {
+            var el = $("s" + i);
+            el.className = "slot" + (darts[i] ? " filled" : i === darts.length ? " next" : "");
+            el.textContent = darts[i] ? darts[i].l : "·";
+          }
+        }
+        function addMark(x, y) {
+          var g = document.createElementNS(NS, "g");
+          var c1 = document.createElementNS(NS, "circle");
+          c1.setAttribute("cx", x); c1.setAttribute("cy", y); c1.setAttribute("r", 7);
+          c1.setAttribute("fill", "#ffffff"); c1.setAttribute("opacity", "0.35");
+          var c2 = document.createElementNS(NS, "circle");
+          c2.setAttribute("cx", x); c2.setAttribute("cy", y); c2.setAttribute("r", 4.2);
+          c2.setAttribute("fill", "#ff3b3b");
+          var c3 = document.createElementNS(NS, "circle");
+          c3.setAttribute("cx", x - 1.1); c3.setAttribute("cy", y - 1.1); c3.setAttribute("r", 1.2);
+          c3.setAttribute("fill", "#ffffff"); c3.setAttribute("opacity", "0.6");
+          g.appendChild(c1); g.appendChild(c2); g.appendChild(c3);
+          marks.appendChild(g);
+        }
+        board.addEventListener("click", function (e) {
+          if (darts.length >= 3) return;
+          var r = board.getBoundingClientRect();
+          var x = ((e.clientX - r.left) / r.width) * 264 - 132;
+          var y = ((e.clientY - r.top) / r.height) * 264 - 132;
+          var d = Math.sqrt(x * x + y * y);
+          var n = 0, ring = "s";
+          if (d <= R.bull) { n = 25; ring = "t"; }
+          else if (d <= R.bullOut) { n = 25; ring = "s"; }
+          else if (d <= R.rimIn) {
+            var ang = (Math.atan2(y, x) * 180) / Math.PI + 90 + 9;
+            if (ang < 0) ang += 360;
+            n = S[Math.floor((ang % 360) / 18)];
+            if (d >= R.dblIn) ring = "d";
+            else if (d >= R.trpIn && d <= R.trpOut) ring = "t";
+          }
+          var v = value(n, ring);
+          darts.push({ l: label(n, ring), v: v });
+          if (n !== 0) addMark(x, y);
+          players[cur].s = Math.max(0, players[cur].s - v);
+          render();
+          if (darts.length === 3) {
+            var fl = $("flash");
+            fl.textContent = "Au suivant · " + players[(cur + 1) % 3].n;
+            fl.classList.add("show");
+            setTimeout(function () {
+              fl.classList.remove("show");
+              while (marks.firstChild) marks.removeChild(marks.firstChild);
+              darts = [];
+              cur = (cur + 1) % 3;
+              render();
+            }, 1100);
+          }
+        });
+        $("undo").addEventListener("click", function () {
+          if (!darts.length) return;
+          var d = darts.pop();
+          players[cur].s += d.v;
+          if (marks.lastChild) marks.removeChild(marks.lastChild);
+          render();
+        });
+        render();
+      })();
+    </script>
+  </body>
+</html>

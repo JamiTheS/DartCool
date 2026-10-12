@@ -1,15 +1,15 @@
-/** Accueil : reprise de partie, choix du mode, accès au carnet et aux stats. */
+/** Accueil : reprise de partie, choix du format, accès au carnet et aux stats. */
 import { router } from 'expo-router';
 import React from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { BoardMark } from '@/components/BoardInput';
-import { Chart, Book, Gear, Users } from '@/components/icons';
-import { Card, Label, Screen } from '@/components/ui';
+import { Book, Chart, ChevronRight, Gear, Users } from '@/components/icons';
+import { Label, Screen } from '@/components/ui';
 import { MODES, PRESETS, Preset } from '@/data/modes';
 import { runMatch } from '@/engine';
 import { useApp } from '@/store/app';
-import { alpha, C, R, SP, T } from '@/theme/tokens';
+import { C, R, SH, SP, T } from '@/theme/tokens';
 import { tapMedium } from '@/utils/feedback';
 
 export default function Home() {
@@ -24,14 +24,18 @@ export default function Home() {
 
   return (
     <Screen>
-      <ScrollView contentContainerStyle={{ paddingBottom: SP.xl }} showsVerticalScrollIndicator={false}>
+      <ScrollView contentContainerStyle={{ paddingBottom: SP.xxl }} showsVerticalScrollIndicator={false}>
         <View style={s.brandRow}>
-          <BoardMark size={58} />
-          <View style={{ marginLeft: SP.md, flex: 1 }}>
-            <Text style={s.brand}>DARTCOOL</Text>
-            <Text style={[T.small, { marginTop: -2 }]}>
+          <View style={{ flex: 1 }}>
+            <Text style={s.brand}>
+              DART<Text style={{ color: C.pinkInk }}>COOL</Text>
+            </Text>
+            <Text style={[T.small, { color: C.ink3, marginTop: -2 }]}>
               Le carnet de scores de toutes les fléchettes
             </Text>
+          </View>
+          <View style={s.mark}>
+            <BoardMark size={46} />
           </View>
         </View>
 
@@ -41,21 +45,22 @@ export default function Home() {
               tapMedium();
               router.push('/match');
             }}
-            style={({ pressed }) => [s.resume, { opacity: pressed ? 0.85 : 1 }]}>
+            style={({ pressed }) => [s.resume, SH.md, { opacity: pressed ? 0.9 : 1 }]}>
+            <View style={[s.resumeBar, { backgroundColor: C.pink }]} />
             <View style={{ flex: 1 }}>
-              <Label style={{ color: C.onBrass }}>Reprendre la partie</Label>
-              <Text style={[T.subtitle, { color: C.onBrass, marginTop: 2 }]}>{resume.title}</Text>
-              <Text style={[T.small, { color: alpha(C.onBrass, 0.75), marginTop: 2 }]}>
+              <Label style={{ color: C.pinkInk }}>Partie en cours</Label>
+              <Text style={[T.bodyStrong, { fontSize: 16, marginTop: 2 }]}>{resume.title}</Text>
+              <Text style={[T.small, { color: C.ink3, marginTop: 1 }]} numberOfLines={1}>
                 {resume.players.map((p) => p.name).join(' · ')} — {resumeState.headline}
               </Text>
             </View>
-            <Text style={[T.score, { color: C.onBrass, fontSize: 40 }]}>›</Text>
+            <ChevronRight size={20} color={C.ink3} />
           </Pressable>
         ) : null}
 
         <View style={s.sectionHead}>
-          <Label>Modes de jeu</Label>
-          <Text style={[T.small, { color: C.chalkFaint }]}>{PRESETS.length} formats</Text>
+          <Label>Formats</Label>
+          <Text style={[T.small, { color: C.ink3 }]}>{PRESETS.length} au choix</Text>
         </View>
 
         <View style={s.grid}>
@@ -67,25 +72,25 @@ export default function Home() {
                 onPress={() => open(p)}
                 style={({ pressed }) => [
                   s.tile,
+                  SH.sm,
                   {
-                    backgroundColor: pressed ? C.panelHigher : C.panel,
-                    borderColor: p.featured ? alpha(C.brass, 0.45) : C.line,
+                    backgroundColor: pressed ? C.cardHi2 : p.featured ? C.pinkSoft : C.card,
                   },
                 ]}>
                 <Text
                   style={[
                     T.title,
-                    { fontSize: 30, color: p.featured ? C.brass : C.chalkDim, letterSpacing: 0 },
+                    { fontSize: 32, color: p.featured ? C.pinkInk : C.ink, letterSpacing: 0 },
                   ]}>
                   {p.glyph}
                 </Text>
-                <Text style={[T.bodyStrong, { marginTop: 4 }]} numberOfLines={1}>
+                <Text style={[T.bodyStrong, { marginTop: 5, fontSize: 14 }]} numberOfLines={1}>
                   {p.name}
                 </Text>
-                <Text style={[T.small, { color: C.chalkFaint }]} numberOfLines={1}>
+                <Text style={[T.small, { color: C.ink3, fontSize: 12 }]} numberOfLines={1}>
                   {p.sub}
                 </Text>
-                <Text style={[T.small, { color: C.chalkFaint, marginTop: 6, fontSize: 11 }]} numberOfLines={2}>
+                <Text style={[T.small, { color: C.ink3, marginTop: 5, fontSize: 11 }]} numberOfLines={2}>
                   {mode.tagline}
                 </Text>
               </Pressable>
@@ -98,29 +103,29 @@ export default function Home() {
         </View>
         <View style={s.navRow}>
           <NavBtn
-            icon={<Users color={C.chalk} />}
+            icon={<Users color={C.ink} size={20} />}
             label="Joueurs"
             value={players.length ? `${players.length}` : '—'}
             onPress={() => router.push('/players')}
           />
           <NavBtn
-            icon={<Chart color={C.chalk} />}
+            icon={<Chart color={C.ink} size={20} />}
             label="Stats"
             value={history.length ? `${history.length}` : '—'}
             onPress={() => router.push('/stats')}
           />
-          <NavBtn icon={<Book color={C.chalk} />} label="Règles" onPress={() => router.push('/rules')} />
-          <NavBtn icon={<Gear color={C.chalk} />} label="Réglages" onPress={() => router.push('/settings')} />
+          <NavBtn icon={<Book color={C.ink} size={20} />} label="Règles" onPress={() => router.push('/rules')} />
+          <NavBtn icon={<Gear color={C.ink} size={20} />} label="Réglages" onPress={() => router.push('/settings')} />
         </View>
 
-        {history.length > 0 ? (
-          <Card style={{ marginHorizontal: SP.md, marginTop: SP.md }}>
+        {history.length > 0 && history[0].result ? (
+          <View style={[s.last, SH.sm]}>
             <Label>Dernière partie</Label>
             <Text style={[T.bodyStrong, { marginTop: 4 }]}>{history[0].title}</Text>
-            <Text style={[T.small, { marginTop: 2 }]}>
-              {history[0].result?.ranking.map((r, i) => `${i + 1}. ${r.name} ${r.score}`).join('   ')}
+            <Text style={[T.small, { marginTop: 2, color: C.ink3 }]} numberOfLines={2}>
+              {history[0].result.ranking.map((r, i) => `${i + 1}. ${r.name} ${r.score}`).join('   ')}
             </Text>
-          </Card>
+          </View>
         ) : null}
       </ScrollView>
     </Screen>
@@ -144,10 +149,12 @@ function NavBtn({
         tapMedium();
         onPress();
       }}
-      style={({ pressed }) => [s.nav, { backgroundColor: pressed ? C.panelHigher : C.panel }]}>
+      style={({ pressed }) => [s.nav, SH.sm, { backgroundColor: pressed ? C.cardHi2 : C.card }]}>
       {icon}
-      <Text style={[T.small, { color: C.chalk, marginTop: 6, fontWeight: '700' }]}>{label}</Text>
-      {value ? <Text style={[T.small, { color: C.chalkFaint, fontSize: 11 }]}>{value}</Text> : null}
+      <Text style={[T.small, { color: C.ink, marginTop: 5, fontWeight: '700', fontSize: 12 }]}>
+        {label}
+      </Text>
+      {value ? <Text style={[T.small, { color: C.ink3, fontSize: 11 }]}>{value}</Text> : null}
     </Pressable>
   );
 }
@@ -156,30 +163,39 @@ const s = StyleSheet.create({
   brandRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: SP.md,
+    paddingHorizontal: SP.lg,
     paddingTop: SP.sm,
     paddingBottom: SP.md,
   },
   brand: {
     fontFamily: T.title.fontFamily,
-    fontSize: 42,
-    lineHeight: 44,
-    letterSpacing: 2,
-    color: C.chalk,
+    fontSize: 38,
+    lineHeight: 40,
+    letterSpacing: 1,
+    color: C.ink,
+  },
+  mark: {
+    width: 46,
+    height: 46,
+    borderRadius: 23,
+    overflow: 'hidden',
+    ...SH.sm,
   },
   resume: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: C.brass,
+    gap: SP.sm,
+    backgroundColor: C.card,
     marginHorizontal: SP.md,
-    borderRadius: R.md,
+    borderRadius: R.lg,
     padding: SP.md,
   },
+  resumeBar: { width: 3, height: 38, borderRadius: 2 },
   sectionHead: {
     flexDirection: 'row',
     alignItems: 'baseline',
     justifyContent: 'space-between',
-    paddingHorizontal: SP.md,
+    paddingHorizontal: SP.lg,
     paddingTop: SP.lg,
     paddingBottom: SP.sm,
   },
@@ -192,10 +208,9 @@ const s = StyleSheet.create({
   tile: {
     flexGrow: 1,
     flexBasis: '47%',
-    borderRadius: R.md,
-    borderWidth: 1,
+    borderRadius: R.lg,
     padding: SP.md,
-    minHeight: 124,
+    minHeight: 118,
   },
   navRow: { flexDirection: 'row', gap: SP.xs, paddingHorizontal: SP.md },
   nav: {
@@ -203,7 +218,12 @@ const s = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: SP.md,
     borderRadius: R.md,
-    borderWidth: 1,
-    borderColor: C.line,
+  },
+  last: {
+    marginHorizontal: SP.md,
+    marginTop: SP.md,
+    backgroundColor: C.card,
+    borderRadius: R.lg,
+    padding: SP.md,
   },
 });

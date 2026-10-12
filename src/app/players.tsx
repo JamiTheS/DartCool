@@ -53,7 +53,7 @@ export default function Players() {
                 value={name}
                 onChangeText={setName}
                 placeholder="Prénom ou surnom"
-                placeholderTextColor={C.chalkFaint}
+                placeholderTextColor={C.ink3}
                 style={s.input}
                 maxLength={18}
                 returnKeyType="done"
@@ -61,7 +61,7 @@ export default function Players() {
                 autoCorrect={false}
               />
               <Pressable onPress={add} style={s.addBtn} accessibilityLabel="Ajouter">
-                <Plus color={C.onBrass} />
+                <Plus color={C.onPink} />
               </Pressable>
             </View>
             <Text style={[T.small, { marginTop: SP.sm }]}>
@@ -85,7 +85,7 @@ export default function Players() {
                 }}
                 style={({ pressed }) => [
                   s.row,
-                  { backgroundColor: pressed ? C.panelHigher : C.panel, borderLeftColor: p.color },
+                  { backgroundColor: pressed ? C.cardHi2 : C.card, borderLeftColor: p.color },
                 ]}>
                 <View style={{ flex: 1 }}>
                   <Text style={T.bodyStrong}>{p.name}</Text>
@@ -94,7 +94,7 @@ export default function Players() {
                     {won(p.id) > 1 ? 's' : ''}
                   </Text>
                 </View>
-                <Text style={[T.label, { color: C.chalkFaint }]}>MODIFIER</Text>
+                <Text style={[T.label, { color: C.ink3 }]}>MODIFIER</Text>
               </Pressable>
             ))
           )}
@@ -125,7 +125,7 @@ export default function Players() {
                     s.swatch,
                     {
                       backgroundColor: alpha(c, 0.9),
-                      borderColor: editing.color === c ? C.chalk : 'transparent',
+                      borderColor: editing.color === c ? C.ink : 'transparent',
                     },
                   ]}
                   accessibilityLabel={`Couleur ${c}`}
@@ -143,7 +143,7 @@ export default function Players() {
             <Btn
               label="Retirer du carnet"
               variant="danger"
-              icon={<Trash size={18} color={C.red} />}
+              icon={<Trash size={18} color={C.danger} />}
               onPress={() => {
                 removePlayer(editing.id);
                 setEditId(null);
@@ -161,20 +161,20 @@ const s = StyleSheet.create({
   addRow: { flexDirection: 'row', gap: SP.xs, marginTop: 6 },
   input: {
     flex: 1,
-    backgroundColor: C.panelHigh,
+    backgroundColor: C.cardHi,
     borderRadius: R.sm,
     borderWidth: 1,
     borderColor: C.line,
     paddingHorizontal: SP.md,
     height: 48,
-    color: C.chalk,
+    color: C.ink,
     fontSize: 16,
   },
   addBtn: {
     width: 48,
     height: 48,
     borderRadius: R.sm,
-    backgroundColor: C.brass,
+    backgroundColor: C.pink,
     alignItems: 'center',
     justifyContent: 'center',
   },

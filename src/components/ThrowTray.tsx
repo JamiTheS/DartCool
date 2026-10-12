@@ -1,13 +1,13 @@
 /**
  * Les trois fléchettes de la volée en cours, le total, et l'annulation.
- * Le plateau est toujours visible : on voit ce qui a été saisi avant que la
- * main ne tourne, et on peut revenir en arrière d'un geste.
+ * Toujours visible : on voit ce qui a été saisi avant que la main ne tourne,
+ * et on revient en arrière d'un geste.
  */
 import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { Dart, label as dartLabel, value } from '../engine';
-import { alpha, C, R, SP, T } from '../theme/tokens';
+import { alpha, C, R, SH, SP, T } from '../theme/tokens';
 import { tapMedium } from '../utils/feedback';
 import { Undo } from './icons';
 
@@ -37,17 +37,21 @@ export function ThrowTray({
               key={i}
               style={[
                 s.slot,
+                SH.sm,
                 isTotalEntry ? { flex: 3 } : null,
-                {
-                  borderColor: filled ? alpha(accent, 0.5) : active ? alpha(accent, 0.75) : C.line,
-                  backgroundColor: filled ? alpha(accent, 0.1) : active ? alpha(accent, 0.05) : 'transparent',
-                  borderStyle: filled || active ? 'solid' : 'dashed',
-                },
+                filled
+                  ? { backgroundColor: C.ink }
+                  : active
+                    ? { backgroundColor: C.card, borderWidth: 2, borderColor: alpha(accent, 0.9) }
+                    : { backgroundColor: C.cardHi },
               ]}>
               <Text
                 style={[
                   T.subtitle,
-                  { color: filled ? C.chalk : C.chalkFaint, fontSize: isTotalEntry ? 26 : 21 },
+                  {
+                    color: filled ? '#FFFFFF' : active ? C.ink2 : C.ink3,
+                    fontSize: isTotalEntry ? 26 : 22,
+                  },
                 ]}>
                 {filled ? dartLabel(d) : '·'}
               </Text>
@@ -58,8 +62,8 @@ export function ThrowTray({
 
       <View style={s.right}>
         <View style={{ alignItems: 'flex-end', marginRight: SP.sm }}>
-          <Text style={[T.label, { color: C.chalkFaint }]}>Volée</Text>
-          <Text style={[T.subtitle, { color: total > 0 ? C.chalk : C.chalkFaint }]}>{total}</Text>
+          <Text style={[T.label, { color: C.ink3 }]}>Volée</Text>
+          <Text style={[T.subtitle, { color: total > 0 ? C.ink : C.ink3 }]}>{total}</Text>
         </View>
         <Pressable
           onPress={() => {
@@ -70,14 +74,15 @@ export function ThrowTray({
           disabled={!canUndo}
           style={({ pressed }) => [
             s.undo,
+            SH.sm,
             {
-              opacity: canUndo ? (pressed ? 0.7 : 1) : 0.3,
-              backgroundColor: pressed ? C.panelHigher : C.panelHigh,
+              opacity: canUndo ? (pressed ? 0.7 : 1) : 0.35,
+              backgroundColor: pressed ? C.cardHi2 : C.card,
             },
           ]}
           accessibilityRole="button"
           accessibilityLabel="Annuler la dernière fléchette">
-          <Undo size={20} color={C.chalk} />
+          <Undo size={20} color={C.ink} />
         </Pressable>
       </View>
     </View>
@@ -92,22 +97,19 @@ const s = StyleSheet.create({
     paddingVertical: SP.xs,
     gap: SP.sm,
   },
-  slots: { flexDirection: 'row', flex: 1, gap: 6 },
+  slots: { flexDirection: 'row', flex: 1, gap: 7 },
   slot: {
     flex: 1,
-    height: 48,
+    height: 52,
     borderRadius: R.sm,
-    borderWidth: 1,
     alignItems: 'center',
     justifyContent: 'center',
   },
   right: { flexDirection: 'row', alignItems: 'center' },
   undo: {
-    width: 48,
-    height: 48,
+    width: 52,
+    height: 52,
     borderRadius: R.sm,
-    borderWidth: 1,
-    borderColor: C.line,
     alignItems: 'center',
     justifyContent: 'center',
   },

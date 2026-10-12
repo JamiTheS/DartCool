@@ -9,7 +9,7 @@ import { Btn, Card, Divider, Label, Screen, TopBar } from '@/components/ui';
 import { MODES } from '@/data/modes';
 import { fmt0, fmt1, Match, PlayerMatchStats } from '@/engine';
 import { useApp } from '@/store/app';
-import { alpha, C, R, SP, T } from '@/theme/tokens';
+import { alpha, C, R, SH, SP, T } from '@/theme/tokens';
 
 export default function Summary() {
   const { current, history, rematch, abandonMatch } = useApp();
@@ -30,7 +30,7 @@ export default function Summary() {
   const result = match.result;
   const winner = result.ranking[0];
   const winnerColor =
-    match.players.find((p) => p.id === winner.playerId)?.color ?? C.brass;
+    match.players.find((p) => p.id === winner.playerId)?.color ?? C.pink;
 
   const goRematch = () => {
     const m = rematch();
@@ -49,27 +49,27 @@ export default function Summary() {
       />
 
       <ScrollView contentContainerStyle={{ padding: SP.md, paddingBottom: SP.xl, gap: SP.md }}>
-        <View style={[s.winner, { borderColor: alpha(winnerColor, 0.45), backgroundColor: alpha(winnerColor, 0.08) }]}>
+        <View style={[s.winner, SH.md, { backgroundColor: alpha(winnerColor, 0.14) }]}>
           <View style={{ position: 'absolute', right: -14, top: -14, opacity: 0.12 }}>
             <BoardMark size={130} />
           </View>
           <Trophy size={26} color={winnerColor} />
           <Text style={[T.label, { marginTop: SP.sm }]}>Vainqueur</Text>
-          <Text style={[T.title, { fontSize: 38, color: winnerColor, marginTop: -2 }]}>
+          <Text style={[T.title, { fontSize: 40, color: C.ink, marginTop: -2 }]}>
             {winner.name.toUpperCase()}
           </Text>
-          <Text style={[T.body, { color: C.chalk }]}>{winner.score}</Text>
+          <Text style={[T.body, { color: C.ink }]}>{winner.score}</Text>
         </View>
 
         <Card>
           <Label>Classement</Label>
           <View style={{ marginTop: SP.sm }}>
             {result.ranking.map((r, i) => {
-              const color = match.players.find((p) => p.id === r.playerId)?.color ?? C.chalkDim;
+              const color = match.players.find((p) => p.id === r.playerId)?.color ?? C.ink2;
               return (
                 <View key={r.playerId}>
                   <View style={s.rankRow}>
-                    <Text style={[T.num, { width: 26, color: i === 0 ? C.brass : C.chalkFaint }]}>
+                    <Text style={[T.num, { width: 26, color: i === 0 ? C.pink : C.ink3 }]}>
                       {i + 1}
                     </Text>
                     <Text style={[T.bodyStrong, { flex: 1, color }]}>{r.name}</Text>
@@ -85,7 +85,7 @@ export default function Summary() {
         {result.ranking.map((r) => {
           const st = result.stats[r.playerId];
           if (!st) return null;
-          const color = match.players.find((p) => p.id === r.playerId)?.color ?? C.chalkDim;
+          const color = match.players.find((p) => p.id === r.playerId)?.color ?? C.ink2;
           return <StatCard key={r.playerId} name={r.name} color={color} st={st} x01={match.modeId === 'x01'} />;
         })}
 
@@ -101,7 +101,7 @@ export default function Summary() {
           />
         </View>
 
-        <Text style={[T.small, { textAlign: 'center', color: C.chalkFaint }]}>
+        <Text style={[T.small, { textAlign: 'center', color: C.ink3 }]}>
           {mode.name} · {new Date(match.finishedAt ?? match.startedAt).toLocaleString('fr-FR')}
         </Text>
       </ScrollView>
@@ -157,8 +157,7 @@ function StatCard({
 
 const s = StyleSheet.create({
   winner: {
-    borderWidth: 1,
-    borderRadius: R.lg,
+    borderRadius: R.xl,
     padding: SP.lg,
     alignItems: 'center',
     overflow: 'hidden',

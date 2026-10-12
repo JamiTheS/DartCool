@@ -26,7 +26,7 @@ export type Settings = {
 const DEFAULT_SETTINGS: Settings = {
   haptics: true,
   keepAwake: true,
-  inputMode: 'pad',
+  inputMode: 'board',
   showCheckout: true,
   confirmQuit: true,
 };

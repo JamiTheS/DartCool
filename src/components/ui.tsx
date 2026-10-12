@@ -1,7 +1,8 @@
 /**
- * Briques d'interface communes. Tout ce qui est réutilisé vit ici :
- * écran, barre de titre, carte, bouton, segments, pas-à-pas, interrupteur,
- * feuille modale. Les composants ne décident jamais d'une couleur eux-mêmes.
+ * Briques d'interface communes — version « Porcelaine ».
+ * Cartes blanches posées sur le fond par une ombre à deux couches, filets
+ * presque invisibles, rose réservé à l'état actif. Les composants ne décident
+ * jamais d'une couleur eux-mêmes : tout vient de `theme/tokens`.
  */
 import React from 'react';
 import {
@@ -16,7 +17,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { alpha, C, HIT, R, SP, T } from '../theme/tokens';
+import { alpha, C, HIT, R, SH, SP, T } from '../theme/tokens';
 import { tapLight, tapMedium } from '../utils/feedback';
 import { ChevronLeft, Close } from './icons';
 
@@ -35,7 +36,12 @@ export function Screen({
   return (
     <View
       style={[
-        { flex: 1, backgroundColor: C.base, paddingTop: top ? insets.top : 0, paddingBottom: bottom ? insets.bottom : 0 },
+        {
+          flex: 1,
+          backgroundColor: C.bg,
+          paddingTop: top ? insets.top : 0,
+          paddingBottom: bottom ? insets.bottom : 0,
+        },
         style,
       ]}>
       {children}
@@ -62,26 +68,26 @@ export function TopBar({
             tapLight();
             onBack();
           }}
-          hitSlop={12}
-          style={s.topIcon}
+          hitSlop={10}
+          style={({ pressed }) => [s.roundBtn, pressed ? { backgroundColor: C.cardHi2 } : null]}
           accessibilityRole="button"
           accessibilityLabel="Retour">
-          <ChevronLeft color={C.chalkDim} />
+          <ChevronLeft size={20} color={C.ink2} />
         </Pressable>
       ) : (
-        <View style={s.topIcon} />
+        <View style={{ width: 38 }} />
       )}
-      <View style={{ flex: 1, alignItems: 'center' }}>
-        <Text numberOfLines={1} style={T.subtitle}>
+      <View style={{ flex: 1, paddingHorizontal: SP.sm }}>
+        <Text numberOfLines={1} style={[T.bodyStrong, { fontSize: 15.5 }]}>
           {title}
         </Text>
         {subtitle ? (
-          <Text numberOfLines={1} style={[T.label, { marginTop: 1 }]}>
+          <Text numberOfLines={1} style={[T.small, { color: C.ink3, fontSize: 12 }]}>
             {subtitle}
           </Text>
         ) : null}
       </View>
-      <View style={[s.topIcon, { alignItems: 'flex-end' }]}>{right}</View>
+      <View style={{ minWidth: 38, alignItems: 'flex-end' }}>{right}</View>
     </View>
   );
 }
@@ -96,12 +102,7 @@ export function Card({
   tone?: string;
 }) {
   return (
-    <View
-      style={[
-        s.card,
-        tone ? { borderColor: alpha(tone, 0.35), backgroundColor: alpha(tone, 0.06) } : null,
-        style,
-      ]}>
+    <View style={[s.card, tone ? { backgroundColor: alpha(tone, 0.08) } : null, style]}>
       {children}
     </View>
   );
@@ -135,10 +136,21 @@ export function Btn({
   big?: boolean;
 }) {
   const bg =
-    variant === 'primary' ? C.brass : variant === 'danger' ? C.redSoft : variant === 'quiet' ? C.panelHigh : 'transparent';
+    variant === 'primary'
+      ? C.ink
+      : variant === 'danger'
+        ? C.dangerSoft
+        : variant === 'quiet'
+          ? C.card
+          : 'transparent';
   const fg =
-    variant === 'primary' ? C.onBrass : variant === 'danger' ? C.red : variant === 'ghost' ? C.chalkDim : C.chalk;
-  const border = variant === 'ghost' ? C.line : variant === 'danger' ? alpha(C.red, 0.4) : 'transparent';
+    variant === 'primary'
+      ? '#FFFFFF'
+      : variant === 'danger'
+        ? C.danger
+        : variant === 'ghost'
+          ? C.ink2
+          : C.ink;
 
   return (
     <Pressable
@@ -152,11 +164,11 @@ export function Btn({
       accessibilityLabel={label}
       style={({ pressed }) => [
         s.btn,
+        variant === 'quiet' || variant === 'primary' ? SH.sm : null,
         {
           backgroundColor: bg,
-          borderColor: border,
-          minHeight: big ? 62 : HIT,
-          opacity: disabled ? 0.38 : pressed ? 0.82 : 1,
+          minHeight: big ? 58 : HIT,
+          opacity: disabled ? 0.4 : pressed ? 0.88 : 1,
           transform: [{ scale: pressed && !disabled ? 0.985 : 1 }],
         },
         style,
@@ -164,11 +176,11 @@ export function Btn({
       {icon}
       <Text
         style={[
-          big ? T.subtitle : T.bodyStrong,
+          T.bodyStrong,
           {
             color: fg,
-            letterSpacing: big ? 1.2 : 0.6,
-            textTransform: big ? 'uppercase' : 'none',
+            fontSize: big ? 16 : 15,
+            letterSpacing: big ? 0.2 : 0,
             marginLeft: icon ? 8 : 0,
           },
         ]}>
@@ -204,15 +216,15 @@ export function Segmented({
             }}
             style={[
               s.seg,
-              { paddingVertical: compact ? 7 : 11 },
-              active ? { backgroundColor: C.brass } : null,
+              { paddingVertical: compact ? 8 : 11 },
+              active ? [{ backgroundColor: C.card }, SH.sm] : null,
             ]}
             accessibilityRole="button"
             accessibilityState={{ selected: active }}>
             <Text
               style={[
                 compact ? T.small : T.bodyStrong,
-                { color: active ? C.onBrass : C.chalkDim, fontWeight: '700' },
+                { color: active ? C.ink : C.ink2, fontWeight: '600' },
               ]}>
               {it.label}
             </Text>
@@ -248,14 +260,14 @@ export function Stepper({
   return (
     <View style={s.stepper}>
       <Pressable onPress={() => go(-1)} style={s.stepBtn} accessibilityLabel="Diminuer">
-        <Text style={[T.subtitle, { color: C.chalkDim }]}>−</Text>
+        <Text style={[T.subtitle, { color: C.ink2 }]}>−</Text>
       </Pressable>
-      <Text style={[T.num, { minWidth: 46, textAlign: 'center' }]}>
+      <Text style={[T.num, { minWidth: 44, textAlign: 'center' }]}>
         {value}
         {suffix ?? ''}
       </Text>
       <Pressable onPress={() => go(1)} style={s.stepBtn} accessibilityLabel="Augmenter">
-        <Text style={[T.subtitle, { color: C.chalkDim }]}>+</Text>
+        <Text style={[T.subtitle, { color: C.ink2 }]}>+</Text>
       </Pressable>
     </View>
   );
@@ -283,29 +295,22 @@ export function ToggleRow({
       accessibilityState={{ checked: value }}>
       <View style={{ flex: 1, paddingRight: SP.md }}>
         <Text style={T.bodyStrong}>{label}</Text>
-        {hint ? <Text style={[T.small, { marginTop: 2 }]}>{hint}</Text> : null}
+        {hint ? <Text style={[T.small, { marginTop: 2, color: C.ink3 }]}>{hint}</Text> : null}
       </View>
-      <View style={[s.track, value ? { backgroundColor: alpha(C.brass, 0.4) } : null]}>
-        <View
-          style={[
-            s.knob,
-            value ? { backgroundColor: C.brass, alignSelf: 'flex-end' } : null,
-          ]}
-        />
+      <View style={[s.track, value ? { backgroundColor: C.pink } : null]}>
+        <View style={[s.knob, value ? { alignSelf: 'flex-end' } : null, SH.sm]} />
       </View>
     </Pressable>
   );
 }
 
 export function Chip({ label, tone, strong }: { label: string; tone?: string; strong?: boolean }) {
-  const col = tone ?? C.chalkFaint;
+  const col = tone ?? C.ink3;
   return (
-    <View
-      style={[
-        s.chip,
-        { borderColor: alpha(col, 0.45), backgroundColor: strong ? alpha(col, 0.16) : 'transparent' },
-      ]}>
-      <Text style={[T.small, { color: strong ? col : C.chalkDim, fontWeight: '700' }]}>{label}</Text>
+    <View style={[s.chip, { backgroundColor: strong ? alpha(col, 0.18) : C.cardHi2 }]}>
+      <Text style={[T.small, { color: strong ? C.ink : C.ink2, fontWeight: '600', fontSize: 12 }]}>
+        {label}
+      </Text>
     </View>
   );
 }
@@ -326,11 +331,12 @@ export function Sheet({
     <Modal visible={visible} animationType="slide" transparent onRequestClose={onClose}>
       <View style={s.sheetBack}>
         <Pressable style={{ flex: 1 }} onPress={onClose} accessibilityLabel="Fermer" />
-        <View style={[s.sheet, { paddingBottom: insets.bottom + SP.lg }]}>
+        <View style={[s.sheet, { paddingBottom: insets.bottom + SP.lg }, SH.lg]}>
+          <View style={s.grabber} />
           <View style={s.sheetHead}>
             <Text style={T.subtitle}>{title}</Text>
-            <Pressable onPress={onClose} hitSlop={12} accessibilityLabel="Fermer">
-              <Close color={C.chalkDim} />
+            <Pressable onPress={onClose} hitSlop={12} style={s.roundBtn} accessibilityLabel="Fermer">
+              <Close size={18} color={C.ink2} />
             </Pressable>
           </View>
           <ScrollView style={{ maxHeight: 520 }} contentContainerStyle={{ paddingBottom: SP.md }}>
@@ -343,23 +349,16 @@ export function Sheet({
 }
 
 export function PlayerDot({ color, size = 10 }: { color: string; size?: number }) {
-  return (
-    <View
-      style={{
-        width: size,
-        height: size,
-        borderRadius: size / 2,
-        backgroundColor: color,
-      }}
-    />
-  );
+  return <View style={{ width: size, height: size, borderRadius: size / 2, backgroundColor: color }} />;
 }
 
 export function Empty({ title, text }: { title: string; text: string }) {
   return (
     <View style={{ paddingVertical: SP.xl, alignItems: 'center' }}>
-      <Text style={[T.subtitle, { color: C.chalkDim }]}>{title}</Text>
-      <Text style={[T.small, { textAlign: 'center', marginTop: 6, maxWidth: 280 }]}>{text}</Text>
+      <Text style={[T.subtitle, { color: C.ink2 }]}>{title}</Text>
+      <Text style={[T.small, { textAlign: 'center', marginTop: 6, maxWidth: 280, color: C.ink3 }]}>
+        {text}
+      </Text>
     </View>
   );
 }
@@ -368,71 +367,82 @@ const s = StyleSheet.create({
   topbar: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: SP.sm,
-    height: 48,
+    paddingHorizontal: SP.md,
+    height: 52,
   },
-  topIcon: { width: 44, justifyContent: 'center' },
+  roundBtn: {
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    backgroundColor: C.card,
+    alignItems: 'center',
+    justifyContent: 'center',
+    ...SH.sm,
+  },
   card: {
-    backgroundColor: C.panel,
-    borderRadius: R.md,
-    borderWidth: 1,
-    borderColor: C.line,
+    backgroundColor: C.card,
+    borderRadius: R.lg,
     padding: SP.md,
+    ...SH.sm,
   },
   btn: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: R.md,
-    borderWidth: 1,
     paddingHorizontal: SP.lg,
   },
   segWrap: {
     flexDirection: 'row',
-    backgroundColor: C.panelHigh,
-    borderRadius: R.sm,
-    padding: 3,
-    gap: 3,
+    backgroundColor: C.cardHi2,
+    borderRadius: R.md,
+    padding: 4,
+    gap: 4,
   },
   seg: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: R.xs + 2,
+    borderRadius: R.sm,
     paddingHorizontal: 4,
   },
   stepper: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: C.panelHigh,
+    backgroundColor: C.cardHi2,
     borderRadius: R.sm,
   },
   stepBtn: { width: 44, height: 40, alignItems: 'center', justifyContent: 'center' },
   row: { flexDirection: 'row', alignItems: 'center', paddingVertical: SP.md },
   track: {
-    width: 48,
-    height: 28,
+    width: 50,
+    height: 30,
     borderRadius: R.pill,
-    backgroundColor: C.panelHigher,
+    backgroundColor: C.cardHi2,
     padding: 3,
     justifyContent: 'center',
   },
-  knob: { width: 22, height: 22, borderRadius: 11, backgroundColor: C.chalkFaint },
+  knob: { width: 24, height: 24, borderRadius: 12, backgroundColor: C.card },
   chip: {
-    borderWidth: 1,
     borderRadius: R.sm,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
   },
-  sheetBack: { flex: 1, backgroundColor: 'rgba(0,0,0,0.6)' },
+  sheetBack: { flex: 1, backgroundColor: C.scrim },
   sheet: {
-    backgroundColor: C.panel,
+    backgroundColor: C.card,
     borderTopLeftRadius: R.xl,
     borderTopRightRadius: R.xl,
-    borderTopWidth: 1,
-    borderColor: C.line,
     paddingHorizontal: SP.lg,
-    paddingTop: SP.md,
+    paddingTop: SP.sm,
+  },
+  grabber: {
+    width: 40,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: C.cardHi2,
+    alignSelf: 'center',
+    marginBottom: SP.sm,
   },
   sheetHead: {
     flexDirection: 'row',

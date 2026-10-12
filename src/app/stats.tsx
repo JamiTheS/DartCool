@@ -67,7 +67,7 @@ export default function Stats() {
                   <Cell label="Plus haute sortie" value={st.highFinish ? String(st.highFinish) : '—'} />
                 </View>
                 {st.favouriteMode ? (
-                  <Text style={[T.small, { marginTop: SP.xs, color: C.chalkFaint }]}>
+                  <Text style={[T.small, { marginTop: SP.xs, color: C.ink3 }]}>
                     Mode favori : {MODES[st.favouriteMode].name} ({st.perMode[st.favouriteMode]?.played} parties)
                   </Text>
                 ) : null}
@@ -85,7 +85,7 @@ export default function Stats() {
                   tapLight();
                   setDetail(m);
                 }}
-                style={({ pressed }) => [s.row, { backgroundColor: pressed ? C.panelHigher : C.panel }]}>
+                style={({ pressed }) => [s.row, { backgroundColor: pressed ? C.cardHi2 : C.card }]}>
                 <View style={{ flex: 1 }}>
                   <Text style={T.bodyStrong}>{m.title}</Text>
                   <Text style={[T.small, { marginTop: 2 }]}>
@@ -100,7 +100,7 @@ export default function Stats() {
                 </View>
                 <View style={{ alignItems: 'flex-end' }}>
                   <Label>Vainqueur</Label>
-                  <Text style={[T.bodyStrong, { color: C.brass }]}>
+                  <Text style={[T.bodyStrong, { color: C.pink }]}>
                     {m.result?.ranking[0]?.name ?? '—'}
                   </Text>
                 </View>
@@ -110,7 +110,7 @@ export default function Stats() {
               onPress={clearHistory}
               style={{ paddingVertical: SP.md, alignItems: 'center' }}
               accessibilityRole="button">
-              <Text style={[T.small, { color: C.red }]}>Effacer l’historique</Text>
+              <Text style={[T.small, { color: C.danger }]}>Effacer l’historique</Text>
             </Pressable>
           </>
         )}
@@ -124,7 +124,7 @@ export default function Stats() {
               return (
                 <View key={r.playerId} style={{ marginBottom: SP.md }}>
                   <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                    <Text style={[T.num, { width: 24, color: i === 0 ? C.brass : C.chalkFaint }]}>{i + 1}</Text>
+                    <Text style={[T.num, { width: 24, color: i === 0 ? C.pink : C.ink3 }]}>{i + 1}</Text>
                     <Text style={[T.bodyStrong, { flex: 1 }]}>{r.name}</Text>
                     <Text style={T.num}>{r.score}</Text>
                   </View>
@@ -136,7 +136,7 @@ export default function Stats() {
                 </View>
               );
             })}
-            <Text style={[T.small, { color: C.chalkFaint }]}>
+            <Text style={[T.small, { color: C.ink3 }]}>
               {MODES[detail.modeId].name} ·{' '}
               {new Date(detail.finishedAt ?? detail.startedAt).toLocaleString('fr-FR')}
             </Text>

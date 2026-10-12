@@ -6,9 +6,9 @@
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "dartcool",
-    "userInterfaceStyle": "dark",
-    "backgroundColor": "#0B0E0C",
-    "primaryColor": "#F0B429",
+    "userInterfaceStyle": "light",
+    "backgroundColor": "#F5F4F7",
+    "primaryColor": "#FF9EC4",
     "assetBundlePatterns": [
       "**/*"
     ],
@@ -26,7 +26,7 @@
     "android": {
       "package": "com.dartcool.app",
       "adaptiveIcon": {
-        "backgroundColor": "#0B0E0C",
+        "backgroundColor": "#F5F4F7",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
@@ -42,11 +42,11 @@
       [
         "expo-splash-screen",
         {
-          "backgroundColor": "#0B0E0C",
+          "backgroundColor": "#F5F4F7",
           "image": "./assets/images/splash-icon.png",
-          "imageWidth": 160,
+          "imageWidth": 190,
           "dark": {
-            "backgroundColor": "#0B0E0C",
+            "backgroundColor": "#F5F4F7",
             "image": "./assets/images/splash-icon.png"
           }
         }

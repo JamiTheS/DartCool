@@ -1,14 +1,14 @@
 /**
- * Tableaux de score. Trois formes, selon ce que le mode a besoin de montrer :
- * le reste géant du X01, la grille de marques du Cricket, les lignes de score
- * des autres modes. Le joueur au lancer est toujours en évidence.
+ * Tableaux de score. Compacts par construction : sur l'écran de partie, c'est
+ * la cible qui doit prendre la place. Le joueur au lancer est en évidence, les
+ * autres tiennent sur une ligne.
  */
 import React from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { avg3, CricketState, fmt1, GenericState, X01State } from '../engine';
-import { alpha, C, R, SP, T } from '../theme/tokens';
-import { Chip, PlayerDot } from './ui';
+import { alpha, C, R, SH, SP, T } from '../theme/tokens';
+import { PlayerDot } from './ui';
 
 /* ------------------------------------------------------------------- X01 */
 
@@ -26,88 +26,63 @@ export function X01Scoreboard({
 
   return (
     <View>
-      <View style={[s.hero, { borderColor: alpha(cur.color, 0.4), backgroundColor: alpha(cur.color, 0.07) }]}>
-        <View style={s.heroTop}>
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, flex: 1 }}>
-            <PlayerDot color={cur.color} size={12} />
-            <Text numberOfLines={1} style={[T.title, { flex: 1 }]}>
-              {cur.name.toUpperCase()}
+      <View style={s.hero}>
+        <View style={{ flex: 1 }}>
+          <Text style={T.label}>Au lancer</Text>
+          <View style={s.whoRow}>
+            <PlayerDot color={cur.color} size={11} />
+            <Text numberOfLines={1} style={[T.bodyStrong, { fontSize: 17 }]}>
+              {cur.name}
             </Text>
           </View>
-          {state.legsToWin > 1 || state.setsToWin > 1 ? (
-            <Text style={T.label}>
-              {state.setsToWin > 1 ? `${cur.sets} set · ` : ''}
-              {cur.legs} manche{cur.legs > 1 ? 's' : ''}
-            </Text>
-          ) : (
-            <Text style={T.label}>{state.start} · {state.outRule === 'double' ? 'double' : state.outRule === 'master' ? 'maître' : 'simple'}</Text>
-          )}
+          <Text style={[T.small, { color: C.ink3, marginTop: 2 }]}>
+            {state.legsToWin > 1 || state.setsToWin > 1
+              ? `${state.setsToWin > 1 ? `${cur.sets} set · ` : ''}${cur.legs} manche${cur.legs > 1 ? 's' : ''} · `
+              : ''}
+            moy. {fmt1(avg3(cur.stat))}
+          </Text>
         </View>
-
-        <View style={s.heroMain}>
-          <Text style={[T.hero, { color: cur.color }]}>{cur.score}</Text>
-          <View style={s.heroSide}>
-            <Text style={T.label}>Reste</Text>
-            <Text style={[T.small, { marginTop: 6 }]}>
-              {dartsLeft} fléchette{dartsLeft > 1 ? 's' : ''}
-            </Text>
-            <Text style={[T.small, { marginTop: 2 }]}>moy. {fmt1(avg3(cur.stat))}</Text>
-            {cur.lastTurn !== null ? (
-              <Text style={[T.small, { marginTop: 2 }]}>volée {cur.lastTurn}</Text>
-            ) : null}
-          </View>
+        <View style={{ alignItems: 'flex-end' }}>
+          <Text style={[T.hero, { fontSize: 76, lineHeight: 72, color: C.ink }]}>{cur.score}</Text>
+          <Text style={[T.small, { color: C.ink3, marginTop: 2 }]}>
+            {dartsLeft} fléchette{dartsLeft > 1 ? 's' : ''}
+          </Text>
         </View>
+      </View>
 
+      <View style={s.outRow}>
         {co ? (
-          <View style={s.checkoutRow}>
-            <Text style={[T.label, { color: C.green }]}>Sortie</Text>
+          <>
+            <Text style={[T.label, { color: C.pinkInk }]}>Sortie</Text>
             {co.map((step, i) => (
               <View key={`${step}-${i}`} style={s.coChip}>
-                <Text style={[T.bodyStrong, { color: C.green, letterSpacing: 0.5 }]}>{step}</Text>
+                <Text style={[T.subtitle, { color: C.pinkInk, fontSize: 16 }]}>{step}</Text>
               </View>
             ))}
-          </View>
+          </>
         ) : showCheckout && cur.score > 170 ? (
-          <View style={s.checkoutRow}>
-            <Text style={[T.label, { color: C.chalkFaint }]}>Sortie possible à partir de 170</Text>
-          </View>
-        ) : showCheckout ? (
-          <View style={s.checkoutRow}>
-            <Text style={[T.label, { color: C.red }]}>
-              {dartsLeft > 0 ? 'Aucune sortie avec ces fléchettes' : ''}
-            </Text>
-          </View>
+          <Text style={[T.label, { color: C.ink3 }]}>Sortie possible à partir de 170</Text>
+        ) : showCheckout && dartsLeft > 0 ? (
+          <Text style={[T.label, { color: C.danger }]}>Aucune sortie avec ces fléchettes</Text>
         ) : null}
       </View>
 
       {others.length > 0 ? (
         <ScrollView
-          horizontal={others.length > 3}
+          horizontal
           showsHorizontalScrollIndicator={false}
-          contentContainerStyle={{ gap: 6, paddingTop: 6 }}
-          style={{ marginTop: 2 }}>
-          <View style={others.length > 3 ? { flexDirection: 'row', gap: 6 } : { gap: 6 }}>
-            {others.map((p) => (
-              <View
-                key={p.id}
-                style={[
-                  s.otherRow,
-                  others.length > 3 ? { minWidth: 150 } : null,
-                  { borderLeftColor: p.color },
-                ]}>
-                <Text numberOfLines={1} style={[T.bodyStrong, { flex: 1 }]}>
+          contentContainerStyle={s.othersRow}>
+          {others.map((p) => (
+            <View key={p.id} style={[s.oth, SH.sm]}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
+                <PlayerDot color={p.color} size={7} />
+                <Text numberOfLines={1} style={[T.small, { color: C.ink2, maxWidth: 86 }]}>
                   {p.name}
                 </Text>
-                {state.legsToWin > 1 || state.setsToWin > 1 ? (
-                  <Text style={[T.small, { marginRight: SP.sm }]}>
-                    {state.setsToWin > 1 ? `${p.sets}s · ` : ''}
-                    {p.legs}m
-                  </Text>
-                ) : null}
-                <Text style={[T.num, { color: C.chalk }]}>{p.score}</Text>
               </View>
-            ))}
-          </View>
+              <Text style={[T.subtitle, { fontSize: 23, marginTop: -1 }]}>{p.score}</Text>
+            </View>
+          ))}
         </ScrollView>
       ) : null}
     </View>
@@ -120,11 +95,11 @@ const MARK_GLYPH = ['·', '/', '✕', '⊗'];
 
 export function CricketScoreboard({ state }: { state: CricketState }) {
   return (
-    <View style={s.cricketWrap}>
+    <View style={[s.cricketWrap, SH.sm]}>
       <View style={s.cricketHead}>
         <View style={{ flex: 1 }} />
         {state.targets.map((t) => (
-          <Text key={t} style={[T.label, s.cricketCol, { color: C.chalkDim }]}>
+          <Text key={t} style={[T.label, s.cricketCol]}>
             {t === 25 ? 'B' : t}
           </Text>
         ))}
@@ -138,14 +113,11 @@ export function CricketScoreboard({ state }: { state: CricketState }) {
             key={p.id}
             style={[
               s.cricketRow,
-              {
-                borderLeftColor: active ? p.color : 'transparent',
-                backgroundColor: active ? alpha(p.color, 0.08) : 'transparent',
-              },
+              active ? { backgroundColor: alpha(p.color, 0.14) } : null,
             ]}>
             <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', gap: 6 }}>
               <PlayerDot color={p.color} size={8} />
-              <Text numberOfLines={1} style={[active ? T.bodyStrong : T.body, { flex: 1 }]}>
+              <Text numberOfLines={1} style={[active ? T.bodyStrong : T.body, { flex: 1, fontSize: 14 }]}>
                 {p.name}
               </Text>
             </View>
@@ -157,15 +129,13 @@ export function CricketScoreboard({ state }: { state: CricketState }) {
                   style={[
                     s.cricketCol,
                     T.num,
-                    { color: m >= 3 ? C.green : m > 0 ? C.chalk : C.chalkFaint, fontSize: 17 },
+                    { color: m >= 3 ? C.ok : m > 0 ? C.ink : C.ink3, fontSize: 16 },
                   ]}>
                   {MARK_GLYPH[Math.min(3, m)]}
                 </Text>
               );
             })}
-            <Text style={[s.cricketPts, T.num, { color: active ? p.color : C.chalk }]}>
-              {p.points}
-            </Text>
+            <Text style={[s.cricketPts, T.num, { color: C.ink }]}>{p.points}</Text>
           </View>
         );
       })}
@@ -181,98 +151,79 @@ export function GenericScoreboard({ state }: { state: GenericState }) {
 
   return (
     <View>
-      <View style={[s.hero, { borderColor: alpha(cur.color, 0.4), backgroundColor: alpha(cur.color, 0.07) }]}>
-        <View style={s.heroTop}>
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, flex: 1 }}>
-            <PlayerDot color={cur.color} size={12} />
-            <Text numberOfLines={1} style={[T.title, { flex: 1 }]}>
-              {cur.name.toUpperCase()}
+      <View style={s.hero}>
+        <View style={{ flex: 1 }}>
+          <Text style={T.label}>Au lancer</Text>
+          <View style={s.whoRow}>
+            <PlayerDot color={cur.color} size={11} />
+            <Text numberOfLines={1} style={[T.bodyStrong, { fontSize: 17 }]}>
+              {cur.name}
             </Text>
           </View>
-          {state.target ? <Chip label={`Cible ${state.target}`} tone={C.brass} strong /> : null}
-        </View>
-
-        <View style={s.heroMain}>
-          <Text style={[T.score, { color: cur.color, fontSize: 72, lineHeight: 74 }]}>
-            {cur.mainText ?? cur.main}
-          </Text>
-          <View style={s.heroSide}>
-            <Text style={T.label}>{state.mainLabel}</Text>
-            {cur.lines.map((l) => (
-              <Text key={l.label} style={[T.small, { marginTop: 3 }]}>
-                {l.label} {l.value}
+          {state.target ? (
+            <View style={[s.target, { backgroundColor: C.pinkSoft }]}>
+              <Text style={[T.bodyStrong, { color: C.pinkInk, fontSize: 13 }]}>
+                Cible {state.target}
               </Text>
-            ))}
-          </View>
+            </View>
+          ) : null}
+        </View>
+        <View style={{ alignItems: 'flex-end' }}>
+          <Text style={[T.hero, { fontSize: 64, lineHeight: 62 }]}>{cur.mainText ?? cur.main}</Text>
+          <Text style={[T.label, { marginTop: 2 }]}>{state.mainLabel}</Text>
         </View>
       </View>
 
       {others.length > 0 ? (
-        <View style={{ gap: 6, marginTop: 8 }}>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.othersRow}>
           {others.map((p) => (
-            <View
-              key={p.id}
-              style={[
-                s.otherRow,
-                { borderLeftColor: p.color, opacity: p.out ? 0.45 : 1 },
-              ]}>
-              <Text numberOfLines={1} style={[T.bodyStrong, { flex: 1 }]}>
-                {p.name}
-              </Text>
-              {p.lines.slice(0, 2).map((l) => (
-                <Text key={l.label} style={[T.small, { marginRight: SP.sm }]}>
-                  {l.label} {l.value}
+            <View key={p.id} style={[s.oth, SH.sm, { opacity: p.out ? 0.45 : 1 }]}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
+                <PlayerDot color={p.color} size={7} />
+                <Text numberOfLines={1} style={[T.small, { color: C.ink2, maxWidth: 86 }]}>
+                  {p.name}
                 </Text>
-              ))}
-              <Text style={[T.num, { color: C.chalk }]}>{p.mainText ?? p.main}</Text>
+              </View>
+              <Text style={[T.subtitle, { fontSize: 23, marginTop: -1 }]}>
+                {p.mainText ?? p.main}
+              </Text>
             </View>
           ))}
-        </View>
+        </ScrollView>
       ) : null}
     </View>
   );
 }
 
 const s = StyleSheet.create({
-  hero: {
-    borderRadius: R.lg,
-    borderWidth: 1,
-    paddingHorizontal: SP.md,
-    paddingTop: SP.sm,
-    paddingBottom: SP.sm,
-  },
-  heroTop: { flexDirection: 'row', alignItems: 'center', gap: SP.sm },
-  heroMain: { flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-between' },
-  heroSide: { alignItems: 'flex-end', paddingBottom: 10 },
-  checkoutRow: {
+  hero: { flexDirection: 'row', alignItems: 'flex-end', paddingHorizontal: SP.xs },
+  whoRow: { flexDirection: 'row', alignItems: 'center', gap: 7, marginTop: 3 },
+  outRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
+    minHeight: 28,
+    paddingHorizontal: SP.xs,
     marginTop: 2,
-    minHeight: 26,
   },
   coChip: {
-    borderWidth: 1,
-    borderColor: alpha(C.green, 0.4),
-    backgroundColor: alpha(C.green, 0.1),
+    backgroundColor: C.pinkSoft,
     borderRadius: R.xs,
-    paddingHorizontal: 7,
+    paddingHorizontal: 9,
     paddingVertical: 2,
   },
-  otherRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: C.panel,
-    borderLeftWidth: 3,
+  othersRow: { gap: 7, paddingVertical: 6, paddingHorizontal: SP.xs },
+  oth: {
+    backgroundColor: C.card,
     borderRadius: R.sm,
-    paddingHorizontal: SP.sm,
-    paddingVertical: 9,
+    paddingHorizontal: 11,
+    paddingVertical: 7,
+    minWidth: 104,
   },
+  target: { alignSelf: 'flex-start', borderRadius: R.pill, paddingHorizontal: 10, paddingVertical: 4, marginTop: 6 },
   cricketWrap: {
-    backgroundColor: C.panel,
+    backgroundColor: C.card,
     borderRadius: R.md,
-    borderWidth: 1,
-    borderColor: C.line,
     paddingHorizontal: SP.sm,
     paddingVertical: SP.xs,
   },
@@ -286,11 +237,10 @@ const s = StyleSheet.create({
   cricketRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    borderLeftWidth: 3,
     paddingVertical: 7,
-    paddingLeft: 6,
+    paddingHorizontal: 6,
     borderRadius: R.xs,
   },
-  cricketCol: { width: 26, textAlign: 'center' },
-  cricketPts: { width: 42, textAlign: 'right' },
+  cricketCol: { width: 25, textAlign: 'center' },
+  cricketPts: { width: 40, textAlign: 'right' },
 });

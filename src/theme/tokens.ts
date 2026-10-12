@@ -1,105 +1,150 @@
 /**
  * DartCool — design tokens.
- * Identité : « Craie & Sisal ». Un tableau de bar réinventé :
- * noir chaud (feutre), craie crème, laiton pour l'action, rouge/vert de cible.
- * Source unique de vérité : aucune couleur, taille ou espacement en dur ailleurs.
+ *
+ * Identité « Porcelaine » : une app blanche et claire, du verre là où du contenu
+ * passe dessous, un rose et une pêche comme seules couleurs d'accent, et la
+ * cible de fléchettes comme unique objet sombre de l'écran — c'est elle qui
+ * porte le regard.
+ *
+ * Source unique de vérité : aucune couleur, aucun rayon, aucune ombre en dur
+ * ailleurs dans le code.
  */
-import { Platform, TextStyle } from 'react-native';
+import { Platform, TextStyle, ViewStyle } from 'react-native';
 
 export const C = {
-  /** Fond général, noir chaud à sous-ton vert (feutre de bar). */
-  base: '#0B0E0C',
-  /** Panneaux, cartes. */
-  panel: '#131815',
-  /** Panneau surélevé (touche de pavé, ligne active). */
-  panelHigh: '#1C2420',
-  panelHigher: '#263028',
-  /** Filets façon trait de craie. */
-  line: '#2A332D',
-  lineSoft: 'rgba(242,239,230,0.08)',
+  /** Fond général : blanc chaud légèrement froid, jamais de blanc pur. */
+  bg: '#F5F4F7',
+  /** Carte posée sur le fond. */
+  card: '#FFFFFF',
+  /** Surface légèrement en retrait (touches de pavé, champs). */
+  cardHi: '#FBFAFC',
+  cardHi2: '#F0EFF4',
+  /** Filets : presque invisibles, l'ombre fait le travail. */
+  line: 'rgba(22,22,28,0.07)',
+  lineSoft: 'rgba(22,22,28,0.04)',
 
-  /** Texte principal : craie. */
-  chalk: '#F3F0E7',
-  chalkDim: '#A9B0A6',
-  chalkFaint: '#6B736C',
+  /** Encre. */
+  ink: '#16161C',
+  ink2: '#6C6C78',
+  ink3: '#A6A6B2',
 
-  /** Laiton : couleur de marque, état actif, joueur au lancer. */
-  brass: '#F0B429',
-  brassSoft: 'rgba(240,180,41,0.14)',
-  onBrass: '#1A1304',
+  /** Rose : l'état actif, le joueur au lancer, l'anneau de double. */
+  pink: '#FF9EC4',
+  pinkInk: '#D8528C',
+  pinkSoft: '#FFEEF5',
+  onPink: '#3A1223',
 
-  /** Rouge et vert de cible. */
-  red: '#D23B2E',
-  redSoft: 'rgba(210,59,46,0.14)',
-  green: '#2FA86B',
-  greenSoft: 'rgba(47,168,107,0.14)',
-  sisal: '#D9C08A',
+  /** Pêche : le second accent, l'anneau de triple. */
+  peach: '#FFC08A',
+  peachInk: '#C97F35',
+  peachSoft: '#FFF3E6',
+
+  /** États. */
+  ok: '#3BA776',
+  okSoft: '#E7F6EF',
+  danger: '#E5484D',
+  dangerSoft: '#FDECEC',
+  /** Marque laissée par une fléchette sur la cible. */
+  mark: '#FF3B3B',
+
+  /** Matières de la cible. */
+  boardDark: 'rgba(22,22,28,0.92)',
+  boardLight: 'rgba(226,226,236,0.80)',
+  boardRim: '#1B1B22',
+  boardWire: 'rgba(255,255,255,0.22)',
+
+  /** Verre : dock de saisie, barre d'onglets, feuilles. */
+  glass: 'rgba(255,255,255,0.72)',
+  glassLine: 'rgba(255,255,255,0.9)',
+  scrim: 'rgba(22,22,28,0.45)',
 } as const;
 
-/** Couleurs de joueur : palette de plumes de fléchettes. */
+/** Couleurs de joueur : pastels distinguables, lisibles sur blanc. */
 export const PLAYER_COLORS = [
-  '#F0B429', // laiton
-  '#3BA3D0', // cyan
-  '#D23B2E', // rouge
-  '#2FA86B', // vert
-  '#A77BE0', // violet
-  '#E8743B', // orange
-  '#E2D04A', // citron
-  '#5FD3C4', // turquoise
+  '#FF9EC4', // rose
+  '#8FC4E8', // bleu
+  '#FFC08A', // pêche
+  '#9BD9BE', // menthe
+  '#C4B5F0', // lilas
+  '#F5A9A9', // corail
+  '#FFD98A', // miel
+  '#A8D8D0', // turquoise
 ] as const;
 
 export const SP = { xs: 6, sm: 10, md: 14, lg: 20, xl: 28, xxl: 40 } as const;
-export const R = { xs: 4, sm: 8, md: 12, lg: 18, xl: 26, pill: 999 } as const;
+
+/** Les rayons sont hiérarchisés : c'est ce qui évite l'effet gabarit. */
+export const R = { xs: 8, sm: 13, md: 18, lg: 24, xl: 30, dock: 34, pill: 999 } as const;
+
+/** Ombres à deux couches : un contact net, une diffusion large. */
+export const SH: Record<'sm' | 'md' | 'lg', ViewStyle> = {
+  sm: {
+    shadowColor: '#16161C',
+    shadowOpacity: 0.06,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 2,
+  },
+  md: {
+    shadowColor: '#16161C',
+    shadowOpacity: 0.1,
+    shadowRadius: 20,
+    shadowOffset: { width: 0, height: 8 },
+    elevation: 5,
+  },
+  lg: {
+    shadowColor: '#16161C',
+    shadowOpacity: 0.14,
+    shadowRadius: 34,
+    shadowOffset: { width: 0, height: 16 },
+    elevation: 10,
+  },
+};
 
 /**
- * Polices système uniquement : zéro fichier à charger, donc zéro risque de
- * blocage au démarrage, et un rendu « tableau de score » natif sur iOS.
+ * Polices système : zéro fichier à charger, donc zéro risque au démarrage,
+ * et des chiffres condensés qui donnent son caractère sportif à l'app.
  */
 export const FONT = {
-  /** Gros chiffres, titres : condensé. */
   display: Platform.select({
     ios: 'DIN Condensed',
     android: 'sans-serif-condensed',
-    default: 'Oswald, Arial Narrow, system-ui, sans-serif',
+    default: 'Barlow Condensed, Oswald, system-ui, sans-serif',
   }),
-  /** Chiffres secondaires, étiquettes techniques. */
   numeric: Platform.select({
     ios: 'DIN Alternate',
     android: 'sans-serif-condensed',
     default: 'Inter, system-ui, sans-serif',
   }),
-  /** Texte courant : police système. */
-  body: Platform.select({ ios: undefined, android: undefined, default: 'system-ui, sans-serif' }),
+  body: Platform.select({ ios: undefined, android: undefined, default: 'Inter, system-ui, sans-serif' }),
 } as const;
 
-/** Chiffres à largeur fixe : indispensable pour un score qui ne tremble pas. */
+/** Chiffres à largeur fixe : un score ne doit jamais trembler. */
 export const TABULAR: TextStyle = { fontVariant: ['tabular-nums'] };
 
 export const T = {
-  /** Score géant (reste au 501). */
-  hero: { fontFamily: FONT.display, fontSize: 104, lineHeight: 104, color: C.chalk, ...TABULAR },
-  score: { fontFamily: FONT.display, fontSize: 56, lineHeight: 58, color: C.chalk, ...TABULAR },
-  scoreSm: { fontFamily: FONT.display, fontSize: 34, lineHeight: 36, color: C.chalk, ...TABULAR },
-  title: { fontFamily: FONT.display, fontSize: 30, lineHeight: 34, color: C.chalk, letterSpacing: 0.5 },
-  subtitle: { fontFamily: FONT.display, fontSize: 21, lineHeight: 25, color: C.chalk },
-  num: { fontFamily: FONT.numeric, fontSize: 19, color: C.chalk, ...TABULAR },
-  body: { fontFamily: FONT.body, fontSize: 15, lineHeight: 21, color: C.chalkDim },
-  bodyStrong: { fontFamily: FONT.body, fontSize: 15, lineHeight: 21, color: C.chalk, fontWeight: '600' as const },
-  small: { fontFamily: FONT.body, fontSize: 13, lineHeight: 18, color: C.chalkDim },
-  /** Étiquette en capitales espacées : les repères du tableau. */
+  hero: { fontFamily: FONT.display, fontSize: 92, lineHeight: 90, color: C.ink, ...TABULAR },
+  score: { fontFamily: FONT.display, fontSize: 52, lineHeight: 54, color: C.ink, ...TABULAR },
+  scoreSm: { fontFamily: FONT.display, fontSize: 30, lineHeight: 32, color: C.ink, ...TABULAR },
+  title: { fontFamily: FONT.display, fontSize: 30, lineHeight: 34, color: C.ink, letterSpacing: 0.3 },
+  subtitle: { fontFamily: FONT.display, fontSize: 21, lineHeight: 25, color: C.ink },
+  num: { fontFamily: FONT.numeric, fontSize: 18, color: C.ink, ...TABULAR },
+  body: { fontFamily: FONT.body, fontSize: 15, lineHeight: 21, color: C.ink2 },
+  bodyStrong: { fontFamily: FONT.body, fontSize: 15, lineHeight: 21, color: C.ink, fontWeight: '600' as const },
+  small: { fontFamily: FONT.body, fontSize: 13, lineHeight: 18, color: C.ink2 },
   label: {
     fontFamily: FONT.body,
-    fontSize: 11,
+    fontSize: 10.5,
     lineHeight: 14,
-    letterSpacing: 1.4,
+    letterSpacing: 1.3,
     textTransform: 'uppercase' as const,
-    color: C.chalkFaint,
+    color: C.ink3,
     fontWeight: '700' as const,
   },
 } as const;
 
 /** Cible de toucher minimale, pensée pour une main qui tient trois fléchettes. */
-export const HIT = 56;
+export const HIT = 52;
 
 export function alpha(hex: string, a: number): string {
   const h = hex.replace('#', '');

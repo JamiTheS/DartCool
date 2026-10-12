@@ -1,13 +1,12 @@
 /**
- * Écran de partie. Trois zones immuables : le tableau de score en haut, les
- * trois fléchettes de la volée au milieu, la saisie en bas sous le pouce.
- * Rien ne bouge d'un mode à l'autre : seules la zone de score et les cibles
- * éclairées changent.
+ * Écran de partie. La cible occupe la moitié basse de l'écran : on appuie là
+ * où la fléchette est plantée, une marque rouge reste posée, et la troisième
+ * passe la main. Le pavé et la saisie par total restent à un appui.
  */
 import { router } from 'expo-router';
 import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { LayoutChangeEvent, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { LayoutChangeEvent, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { BoardInput } from '@/components/BoardInput';
 import { CricketScoreboard, GenericScoreboard, X01Scoreboard } from '@/components/boards';
@@ -19,7 +18,7 @@ import { Btn, Divider, Label, Screen, Sheet, TopBar } from '@/components/ui';
 import { MODES } from '@/data/modes';
 import { Dart, label as dartLabel, MISS, runMatch } from '@/engine';
 import { useApp } from '@/store/app';
-import { alpha, C, R, SP, T } from '@/theme/tokens';
+import { alpha, C, R, SH, SP, T } from '@/theme/tokens';
 import { tapError, tapMedium, tapSuccess } from '@/utils/feedback';
 
 type InputMode = 'pad' | 'board' | 'total';
@@ -31,7 +30,7 @@ export default function MatchScreen() {
   const [rules, setRules] = useState(false);
   const [quit, setQuit] = useState(false);
   const [turnsSheet, setTurnsSheet] = useState(false);
-  const [inputBox, setInputBox] = useState({ w: 0, h: 0 });
+  const [box, setBox] = useState({ w: 0, h: 0 });
   const lastFlash = useRef<string | null>(null);
 
   // L'écran reste allumé pendant la partie : personne ne veut déverrouiller
@@ -40,8 +39,11 @@ export default function MatchScreen() {
     if (!settings.keepAwake) return;
     activateKeepAwakeAsync().catch(() => {});
     return () => {
+      // Selon la plateforme, la libération renvoie une promesse qui peut être
+      // rejetée si le verrou n'était pas encore posé : on l'absorbe des deux
+      // façons, sinon la fin de partie affiche une erreur.
       try {
-        deactivateKeepAwake();
+        Promise.resolve(deactivateKeepAwake()).catch(() => {});
       } catch {
         // sans conséquence
       }
@@ -54,7 +56,6 @@ export default function MatchScreen() {
 
   const state = useMemo(() => (current ? runMatch(current) : null), [current]);
 
-  // Fin de partie : on archive et on affiche le résultat.
   useEffect(() => {
     if (!state?.finished) return;
     tapSuccess();
@@ -62,17 +63,16 @@ export default function MatchScreen() {
     router.replace('/summary');
   }, [state?.finished, finishMatch]);
 
-  // Retour haptique sur les événements marquants.
   useEffect(() => {
-    const f = state?.flash;
-    if (!f) {
+    const fl = state?.flash;
+    if (!fl) {
       lastFlash.current = null;
       return;
     }
-    if (lastFlash.current === f.text) return;
-    lastFlash.current = f.text;
-    if (f.kind === 'bust' || f.kind === 'out') tapError();
-    else if (f.kind === 'win' || f.kind === 'leg' || f.kind === 'big') tapSuccess();
+    if (lastFlash.current === fl.text) return;
+    lastFlash.current = fl.text;
+    if (fl.kind === 'bust' || fl.kind === 'out') tapError();
+    else if (fl.kind === 'win' || fl.kind === 'leg' || fl.kind === 'big') tapSuccess();
   }, [state?.flash]);
 
   if (!current || !state) return <Screen />;
@@ -93,34 +93,38 @@ export default function MatchScreen() {
     router.replace('/');
   };
 
-  const onInputLayout = (e: LayoutChangeEvent) => {
+  const onBox = (e: LayoutChangeEvent) => {
     const { width, height } = e.nativeEvent.layout;
-    setInputBox({ w: width, h: height });
+    setBox({ w: width, h: height });
   };
 
-  const boardSize = Math.max(180, Math.min(inputBox.w, inputBox.h - 46));
+  const boardSize = Math.max(200, Math.min(box.w, box.h - 34));
   const flash = state.flash;
-  const statusColor =
+  const flashColor =
     flash?.kind === 'bust' || flash?.kind === 'out'
-      ? C.red
+      ? C.danger
       : flash?.kind === 'win' || flash?.kind === 'leg'
-        ? C.green
+        ? C.ok
         : flash?.kind === 'big'
-          ? C.brass
-          : C.chalkDim;
+          ? C.pinkInk
+          : C.ink2;
 
   return (
     <Screen>
       <TopBar
-        title={mode.name}
+        title={current.title}
         subtitle={state.headline}
         onBack={() => {
           if (settings.confirmQuit && current.darts.length > 0) setQuit(true);
           else doQuit();
         }}
         right={
-          <Pressable onPress={() => setMenu(true)} hitSlop={12} accessibilityLabel="Menu de la partie">
-            <Dots color={C.chalkDim} />
+          <Pressable
+            onPress={() => setMenu(true)}
+            hitSlop={12}
+            style={s.menuBtn}
+            accessibilityLabel="Menu de la partie">
+            <Dots color={C.ink2} />
           </Pressable>
         }
       />
@@ -136,12 +140,9 @@ export default function MatchScreen() {
       </View>
 
       <View style={s.status}>
-        <Text numberOfLines={1} style={[T.small, { color: statusColor, fontWeight: '700', flex: 1 }]}>
-          {flash?.text ?? state.hint ?? `Au lancer : ${cur.name}`}
+        <Text numberOfLines={1} style={[T.small, { color: flashColor, fontWeight: '700', flex: 1 }]}>
+          {flash?.text ?? state.hint ?? ''}
         </Text>
-        {state.target && state.kind !== 'generic' ? (
-          <Text style={[T.label, { color: C.brass }]}>CIBLE {state.target}</Text>
-        ) : null}
       </View>
 
       <ThrowTray
@@ -151,18 +152,19 @@ export default function MatchScreen() {
         accent={cur.color}
       />
 
-      <View style={s.inputArea} onLayout={onInputLayout}>
-        {input === 'pad' ? (
+      <View style={s.inputArea} onLayout={onBox}>
+        {input === 'board' ? (
+          <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <BoardInput
+            onDart={onDart}
+            focus={state.focus}
+            focusMult={state.focusMult}
+            size={boardSize}
+            turnCount={state.turnDarts.length}
+          />
+          </View>
+        ) : input === 'pad' ? (
           <DartPad onDart={onDart} focus={state.focus} focusMult={state.focusMult} />
-        ) : input === 'board' ? (
-          <ScrollView contentContainerStyle={{ alignItems: 'center' }} showsVerticalScrollIndicator={false}>
-            <BoardInput
-              onDart={onDart}
-              focus={state.focus}
-              focusMult={state.focusMult}
-              size={boardSize}
-            />
-          </ScrollView>
         ) : (
           <TotalPad
             onDart={onDart}
@@ -173,8 +175,8 @@ export default function MatchScreen() {
 
       <View style={s.switchRow}>
         {([
-          ['pad', 'Pavé'],
           ['board', 'Cible'],
+          ['pad', 'Pavé'],
           ['total', 'Total'],
         ] as const).map(([key, lbl]) => {
           const allowed = key !== 'total' || (state.allowTotal && state.dartsInTurn === 0);
@@ -192,15 +194,12 @@ export default function MatchScreen() {
               }}
               style={[
                 s.switchBtn,
-                {
-                  backgroundColor: active ? alpha(C.brass, 0.16) : 'transparent',
-                  borderColor: active ? alpha(C.brass, 0.5) : C.line,
-                  opacity: allowed ? 1 : 0.35,
-                },
+                active ? [{ backgroundColor: C.card }, SH.sm] : null,
+                { opacity: allowed ? 1 : 0.35 },
               ]}
               accessibilityRole="button"
               accessibilityState={{ selected: active }}>
-              <Text style={[T.small, { color: active ? C.brass : C.chalkDim, fontWeight: '700' }]}>
+              <Text style={[T.bodyStrong, { color: active ? C.ink : C.ink2, fontSize: 13.5 }]}>
                 {lbl}
               </Text>
             </Pressable>
@@ -253,8 +252,8 @@ export default function MatchScreen() {
       <Sheet visible={rules} onClose={() => setRules(false)} title={`Règles · ${mode.name}`}>
         {mode.rules.map((r, i) => (
           <View key={i} style={{ flexDirection: 'row', marginBottom: SP.sm }}>
-            <Text style={[T.num, { color: C.brass, width: 22 }]}>{i + 1}</Text>
-            <Text style={[T.body, { flex: 1, color: C.chalk }]}>{r}</Text>
+            <Text style={[T.num, { color: C.pinkInk, width: 22 }]}>{i + 1}</Text>
+            <Text style={[T.body, { flex: 1, color: C.ink }]}>{r}</Text>
           </View>
         ))}
       </Sheet>
@@ -268,12 +267,13 @@ export default function MatchScreen() {
             return (
               <View key={`${t.round}-${i}`}>
                 <View style={s.turnRow}>
-                  <Label style={{ width: 34 }}>T{t.round}</Label>
-                  <Text style={[T.bodyStrong, { flex: 1, color: p.color }]}>{p.name}</Text>
+                  <Label style={{ width: 32 }}>T{t.round}</Label>
+                  <Text style={[T.bodyStrong, { flex: 1, fontSize: 14 }]}>{p.name}</Text>
                   <Text style={[T.small, { flex: 1.3 }]}>
                     {t.darts.map((d) => dartLabel(d)).join(' · ')}
                   </Text>
-                  <Text style={[T.num, { width: 46, textAlign: 'right', color: t.bust ? C.red : C.chalk }]}>
+                  <Text
+                    style={[T.num, { width: 46, textAlign: 'right', color: t.bust ? C.danger : C.ink }]}>
                     {t.bust ? 'BUST' : t.scored}
                   </Text>
                 </View>
@@ -296,27 +296,32 @@ export default function MatchScreen() {
 }
 
 const s = StyleSheet.create({
-  status: {
-    flexDirection: 'row',
+  menuBtn: {
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    backgroundColor: C.card,
     alignItems: 'center',
-    gap: SP.sm,
-    paddingHorizontal: SP.md,
-    height: 26,
+    justifyContent: 'center',
+    ...SH.sm,
   },
-  inputArea: { flex: 1, paddingHorizontal: SP.md, paddingBottom: SP.xs },
+  status: { paddingHorizontal: SP.md, height: 22, justifyContent: 'center' },
+  inputArea: { flex: 1, paddingHorizontal: SP.md },
   switchRow: {
     flexDirection: 'row',
-    gap: SP.xs,
-    paddingHorizontal: SP.md,
-    paddingTop: SP.xs,
-    paddingBottom: SP.xs,
+    gap: 4,
+    marginHorizontal: SP.md,
+    marginTop: SP.xs,
+    marginBottom: SP.xs,
+    padding: 4,
+    backgroundColor: alpha('#16161C', 0.05),
+    borderRadius: R.md,
   },
   switchBtn: {
     flex: 1,
     alignItems: 'center',
     paddingVertical: 10,
     borderRadius: R.sm,
-    borderWidth: 1,
   },
   turnRow: { flexDirection: 'row', alignItems: 'center', paddingVertical: 9, gap: 6 },
 });

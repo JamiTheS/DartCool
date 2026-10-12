@@ -16,7 +16,7 @@ const S = ({ size = 22, children }: { size?: number; children: React.ReactNode }
 );
 
 const stroke = (color?: string) => ({
-  stroke: color ?? C.chalk,
+  stroke: color ?? C.ink,
   strokeWidth: 2,
   strokeLinecap: 'round' as const,
   strokeLinejoin: 'round' as const,
@@ -107,9 +107,9 @@ export const Shuffle = ({ size, color }: P) => (
 
 export const Dots = ({ size, color }: P) => (
   <S size={size}>
-    <Circle cx="5" cy="12" r="1.6" fill={color ?? C.chalk} />
-    <Circle cx="12" cy="12" r="1.6" fill={color ?? C.chalk} />
-    <Circle cx="19" cy="12" r="1.6" fill={color ?? C.chalk} />
+    <Circle cx="5" cy="12" r="1.6" fill={color ?? C.ink} />
+    <Circle cx="12" cy="12" r="1.6" fill={color ?? C.ink} />
+    <Circle cx="19" cy="12" r="1.6" fill={color ?? C.ink} />
   </S>
 );
 
@@ -117,7 +117,7 @@ export const Target = ({ size, color }: P) => (
   <S size={size}>
     <Circle cx="12" cy="12" r="8.5" {...stroke(color)} />
     <Circle cx="12" cy="12" r="4.5" {...stroke(color)} />
-    <Circle cx="12" cy="12" r="1" fill={color ?? C.chalk} />
+    <Circle cx="12" cy="12" r="1" fill={color ?? C.ink} />
   </S>
 );
 

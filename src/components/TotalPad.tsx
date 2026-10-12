@@ -9,7 +9,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { isPossibleTurnTotal, totalDart } from '../engine';
 import { Dart } from '../engine/darts';
-import { alpha, C, R, SP, T } from '../theme/tokens';
+import { C, R, SH, SP, T } from '../theme/tokens';
 import { tapError, tapLight } from '../utils/feedback';
 import { Check, Undo } from './icons';
 
@@ -61,8 +61,8 @@ export function TotalPad({
   return (
     <View style={{ flex: 1 }}>
       <View style={s.display}>
-        <Text style={[T.score, { color: raw ? C.chalk : C.chalkFaint }]}>{raw || '—'}</Text>
-        <Text style={[T.label, { color: warn ? C.red : C.chalkFaint }]}>
+        <Text style={[T.score, { color: raw ? C.ink : C.ink3 }]}>{raw || '—'}</Text>
+        <Text style={[T.label, { color: warn ? C.danger : C.ink3 }]}>
           {warn ?? 'Total de la volée'}
         </Text>
       </View>
@@ -72,13 +72,10 @@ export function TotalPad({
           <Pressable
             key={q}
             onPress={() => send(q)}
-            style={({ pressed }) => [
-              s.quick,
-              { backgroundColor: pressed ? alpha(C.brass, 0.25) : 'transparent' },
-            ]}
+            style={({ pressed }) => [s.quick, { backgroundColor: pressed ? C.pinkSoft : C.cardHi }]}
             accessibilityRole="button"
             accessibilityLabel={`Volée de ${q}`}>
-            <Text style={[T.small, { color: C.chalkDim, fontWeight: '700' }]}>{q}</Text>
+            <Text style={[T.small, { color: C.ink2, fontWeight: '700' }]}>{q}</Text>
           </Pressable>
         ))}
       </View>
@@ -88,10 +85,10 @@ export function TotalPad({
           <Pressable
             key={d}
             onPress={() => push(d)}
-            style={({ pressed }) => [s.key, { backgroundColor: pressed ? C.panelHigher : C.panelHigh }]}
+            style={({ pressed }) => [s.key, SH.sm, { backgroundColor: pressed ? C.cardHi2 : C.card }]}
             accessibilityRole="button"
             accessibilityLabel={d}>
-            <Text style={T.scoreSm}>{d}</Text>
+            <Text style={[T.scoreSm, { fontSize: 28 }]}>{d}</Text>
           </Pressable>
         ))}
         <Pressable
@@ -99,31 +96,32 @@ export function TotalPad({
             tapLight();
             setRaw((r) => r.slice(0, -1));
           }}
-          style={({ pressed }) => [s.key, { backgroundColor: pressed ? C.panelHigher : C.panel }]}
+          style={({ pressed }) => [s.key, { backgroundColor: pressed ? C.cardHi2 : C.cardHi }]}
           accessibilityRole="button"
           accessibilityLabel="Effacer un chiffre">
-          <Undo size={20} color={C.chalkDim} />
+          <Undo size={20} color={C.ink2} />
         </Pressable>
         <Pressable
           onPress={() => push('0')}
-          style={({ pressed }) => [s.key, { backgroundColor: pressed ? C.panelHigher : C.panelHigh }]}
+          style={({ pressed }) => [s.key, SH.sm, { backgroundColor: pressed ? C.cardHi2 : C.card }]}
           accessibilityRole="button"
           accessibilityLabel="0">
-          <Text style={T.scoreSm}>0</Text>
+          <Text style={[T.scoreSm, { fontSize: 28 }]}>0</Text>
         </Pressable>
         <Pressable
           onPress={() => (n === null ? tapError() : send(n))}
           disabled={!valid}
           style={({ pressed }) => [
             s.key,
+            valid ? SH.sm : null,
             {
-              backgroundColor: valid ? (pressed ? alpha(C.brass, 0.8) : C.brass) : C.panel,
-              opacity: valid ? 1 : 0.5,
+              backgroundColor: valid ? (pressed ? C.pinkInk : C.ink) : C.cardHi,
+              opacity: valid ? 1 : 0.6,
             },
           ]}
           accessibilityRole="button"
           accessibilityLabel="Valider la volée">
-          <Check size={24} color={valid ? C.onBrass : C.chalkFaint} />
+          <Check size={24} color={valid ? '#FFFFFF' : C.ink3} />
         </Pressable>
       </View>
     </View>
@@ -140,15 +138,13 @@ const s = StyleSheet.create({
     marginBottom: SP.sm,
   },
   quick: {
-    borderWidth: 1,
-    borderColor: C.line,
     borderRadius: R.sm,
-    paddingHorizontal: 11,
-    paddingVertical: 7,
-    minWidth: 44,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    minWidth: 46,
     alignItems: 'center',
   },
-  grid: { flex: 1, flexDirection: 'row', flexWrap: 'wrap', alignContent: 'stretch', gap: 6 },
+  grid: { flex: 1, flexDirection: 'row', flexWrap: 'wrap', alignContent: 'stretch', gap: 7 },
   key: {
     flexGrow: 1,
     flexBasis: '30%',
@@ -156,7 +152,5 @@ const s = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: R.sm,
-    borderWidth: 1,
-    borderColor: C.line,
   },
 });

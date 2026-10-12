@@ -46,21 +46,21 @@ export default function Privacy() {
         {SECTIONS.map((sec) => (
           <Card key={sec.title}>
             <Label>{sec.title}</Label>
-            <Text style={[T.body, { marginTop: 6, color: C.chalk }]}>{sec.body}</Text>
+            <Text style={[T.body, { marginTop: 6, color: C.ink }]}>{sec.body}</Text>
           </Card>
         ))}
         <View style={{ paddingVertical: SP.md }}>
           <Text style={T.small}>
             Une question ? Écrivez à{' '}
             <Text
-              style={{ color: C.brass }}
+              style={{ color: C.pink }}
               onPress={() => Linking.openURL(`mailto:${LINKS.supportEmail}`).catch(() => {})}>
               {LINKS.supportEmail}
             </Text>
             .
           </Text>
           <Pressable onPress={() => Linking.openURL(LINKS.privacyUrl).catch(() => {})}>
-            <Text style={[T.small, { color: C.chalkFaint, marginTop: 6 }]}>
+            <Text style={[T.small, { color: C.ink3, marginTop: 6 }]}>
               Cette politique est également publiée en ligne.
             </Text>
           </Pressable>

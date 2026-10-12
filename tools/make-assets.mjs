@@ -15,14 +15,14 @@ const HERE = dirname(fileURLToPath(import.meta.url));
 const OUT = resolve(HERE, '../assets/images');
 
 const COL = {
-  base: '#0B0E0C',
-  deep: '#060807',
-  chalk: '#F3F0E7',
-  brass: '#F0B429',
-  red: '#D23B2E',
-  green: '#2FA86B',
-  sisal: '#D9C08A',
-  dark: '#171A18',
+  base: '#F5F4F7',
+  deep: '#ECEAF0',
+  chalk: '#FFFFFF',
+  pink: '#FF9EC4',
+  peach: '#FFC08A',
+  rim: '#1B1B22',
+  dark: '#16161C',
+  light: '#DCDCE6',
 };
 
 const SECTORS = [20, 1, 18, 4, 13, 6, 10, 15, 2, 17, 3, 19, 7, 16, 8, 11, 14, 9, 12, 5];
@@ -52,8 +52,8 @@ function board(R, { wire = true } = {}) {
     const a1 = a - 9;
     const a2 = a + 9;
     const dark = i % 2 === 0;
-    const single = dark ? COL.dark : COL.sisal;
-    const ringCol = dark ? COL.red : COL.green;
+    const single = dark ? COL.dark : COL.light;
+    const ringCol = dark ? COL.pink : COL.peach;
     out += `<path d="${ring(rDblIn, rOut, a1, a2)}" fill="${ringCol}"/>`;
     out += `<path d="${ring(rTrpOut, rDblIn, a1, a2)}" fill="${single}"/>`;
     out += `<path d="${ring(rTrpIn, rTrpOut, a1, a2)}" fill="${ringCol}"/>`;
@@ -67,10 +67,10 @@ function board(R, { wire = true } = {}) {
       out += `<path d="M ${f(x1)} ${f(y1)} L ${f(x2)} ${f(y2)}" stroke="rgba(0,0,0,0.5)" stroke-width="${R * 0.008}"/>`;
     });
   }
-  out += `<circle r="${f(rBullOut)}" fill="${COL.green}"/>`;
-  out += `<circle r="${f(rBullIn)}" fill="${COL.red}"/>`;
-  out += `<circle r="${f(rOut + R * 0.035)}" fill="none" stroke="${COL.deep}" stroke-width="${R * 0.07}"/>`;
-  out += `<circle r="${f(rOut + R * 0.075)}" fill="none" stroke="rgba(243,240,231,0.16)" stroke-width="${R * 0.012}"/>`;
+  out += `<circle r="${f(rBullOut)}" fill="${COL.peach}"/>`;
+  out += `<circle r="${f(rBullIn)}" fill="${COL.pink}"/>`;
+  out += `<circle r="${f(rOut + R * 0.045)}" fill="none" stroke="${COL.rim}" stroke-width="${R * 0.09}"/>`;
+  out += `<circle r="${f(rOut + R * 0.105)}" fill="none" stroke="url(#bezel)" stroke-width="${R * 0.03}"/>`;
   return out;
 }
 
@@ -109,12 +109,25 @@ function svgIcon(size, { bg = true, scale = 1, dart = true, margin = 0.70 } = {}
   const R = half * margin * scale;
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
   <defs>
-    <radialGradient id="g" cx="50%" cy="38%" r="75%">
-      <stop offset="0%" stop-color="#131814"/>
-      <stop offset="100%" stop-color="${COL.base}"/>
+    <radialGradient id="g" cx="50%" cy="34%" r="78%">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="62%" stop-color="${COL.base}"/>
+      <stop offset="100%" stop-color="${COL.deep}"/>
+    </radialGradient>
+    <linearGradient id="bezel" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#EAF1FF"/>
+      <stop offset="30%" stop-color="#FFFFFF"/>
+      <stop offset="52%" stop-color="#FFE3C2"/>
+      <stop offset="74%" stop-color="#FFFFFF"/>
+      <stop offset="100%" stop-color="#DBE8FF"/>
+    </linearGradient>
+    <radialGradient id="halo" cx="50%" cy="50%" r="50%">
+      <stop offset="60%" stop-color="#FF9EC4" stop-opacity="0.18"/>
+      <stop offset="100%" stop-color="#FF9EC4" stop-opacity="0"/>
     </radialGradient>
   </defs>
   ${bg ? `<rect width="${size}" height="${size}" fill="url(#g)"/>` : ''}
+  ${bg ? `<circle cx="${half}" cy="${half}" r="${f(R * 1.55)}" fill="url(#halo)"/>` : ''}
   <g transform="translate(${half} ${half})">
     ${board(R)}
     ${dart ? dartMark(R) : ''}
@@ -146,10 +159,10 @@ await mkdir(OUT, { recursive: true });
 console.log('Génération des visuels DartCool');
 
 // Icône App Store / iOS : 1024, sans transparence, sans coins arrondis.
-await png(svgIcon(1024), 'icon.png', 1024, { alpha: false });
+await png(svgIcon(1024, { dart: false, margin: 0.74 }), 'icon.png', 1024, { alpha: false });
 
 // Android : premier plan dans la zone sûre (66 %), fond uni, monochrome.
-await png(svgIcon(432, { bg: false, scale: 0.66 }), 'android-icon-foreground.png', 432);
+await png(svgIcon(432, { bg: false, scale: 0.66, dart: false }), 'android-icon-foreground.png', 432);
 await png(
   `<svg xmlns="http://www.w3.org/2000/svg" width="432" height="432"><rect width="432" height="432" fill="${COL.base}"/></svg>`,
   'android-icon-background.png',
@@ -158,7 +171,7 @@ await png(
 await png(svgMono(432), 'android-icon-monochrome.png', 432);
 
 // Splash : la cible seule, sur fond transparent.
-await png(svgIcon(512, { bg: false, dart: true, scale: 0.92 }), 'splash-icon.png', 512);
+await png(svgIcon(512, { bg: false, dart: false, scale: 0.92 }), 'splash-icon.png', 512);
 
 // Favicon web.
 await png(svgIcon(64, { dart: false }), 'favicon.png', 64, { alpha: false });
