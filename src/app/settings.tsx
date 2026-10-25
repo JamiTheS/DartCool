@@ -4,7 +4,13 @@ import { router } from 'expo-router';
 import React, { useState } from 'react';
 import { Linking, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
-import { hasPrivacyOptions, showPrivacyOptions } from '@/ads';
+import {
+  ADS_DEBUG,
+  getAdsDiagnostics,
+  hasPrivacyOptions,
+  resetConsent,
+  showPrivacyOptions,
+} from '@/ads';
 import { ChevronRight } from '@/components/icons';
 import { Btn, Card, Divider, Label, Screen, Segmented, Sheet, ToggleRow, TopBar } from '@/components/ui';
 import { LINKS } from '@/data/links';
@@ -19,6 +25,8 @@ export default function SettingsScreen() {
   // N'apparaît que là où le consentement publicitaire est exigé (UE) : ailleurs
   // le formulaire n'existe pas et l'entrée n'aurait rien à ouvrir.
   const [adChoices] = useState(() => hasPrivacyOptions());
+  // Bloc de mise au point : relu à chaque appui sur « Rafraîchir ».
+  const [diag, setDiag] = useState(() => getAdsDiagnostics());
 
   const openUrl = (url: string) => {
     tapLight();
@@ -124,6 +132,51 @@ export default function SettingsScreen() {
             style={{ marginTop: SP.md }}
           />
         </Card>
+
+        {ADS_DEBUG ? (
+          <Card>
+            <Label>Diagnostic publicité</Label>
+            <Text style={[T.small, { marginTop: 4, marginBottom: SP.sm }]}>
+              Bloc temporaire de mise au point. À retirer avant la soumission.
+            </Text>
+            {[
+              ['Consentement', diag.consentStatus],
+              ['Peut demander des pubs', diag.canRequestAds ? 'oui' : 'non'],
+              [
+                'Formulaire affichable',
+                diag.formAvailable === null ? '—' : diag.formAvailable ? 'oui' : 'non',
+              ],
+              ['Options de confidentialité', diag.privacyOptionsRequired ? 'requises' : 'non'],
+              ['Suivi autorisé (ATT)', diag.personalized ? 'oui' : 'non'],
+              ['Pub chargée', diag.adLoaded ? 'oui' : 'non'],
+              ['Demandes envoyées', String(diag.requestCount)],
+            ].map(([k, v]) => (
+              <View key={k} style={s.row}>
+                <Text style={[T.small, { flex: 1 }]}>{k}</Text>
+                <Text style={T.bodyStrong}>{v}</Text>
+              </View>
+            ))}
+            <Divider />
+            <Text style={[T.small, { marginTop: SP.sm }]}>
+              Dernière erreur : {diag.lastError ?? 'aucune'}
+            </Text>
+            <Btn
+              label="Rafraîchir"
+              variant="quiet"
+              onPress={() => setDiag(getAdsDiagnostics())}
+              style={{ marginTop: SP.md }}
+            />
+            <Btn
+              label="Revoir le consentement"
+              variant="ghost"
+              onPress={async () => {
+                await resetConsent();
+                setDiag(getAdsDiagnostics());
+              }}
+              style={{ marginTop: SP.xs }}
+            />
+          </Card>
+        ) : null}
 
         <Text style={[T.small, { textAlign: 'center', color: C.ink3, marginTop: SP.sm }]}>
           DartCool · fait pour les soirées fléchettes

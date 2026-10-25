@@ -15,7 +15,12 @@
  * 3. **Consentement avant toute requête.** Formulaire Google UMP (RGPD) puis
  *    App Tracking Transparency, et seulement ensuite l'initialisation du SDK.
  *    Sans message de consentement publié côté AdMob, le SDK n'a le droit de
- *    faire aucune demande dans l'UE — c'est silencieux et c'est normal.
+ *    faire aucune demande dans l'UE.
+ * 4. **Les échecs sont silencieux pour le joueur, mais pas perdus.** Chaque
+ *    étape retient son erreur dans `lastError` et l'état est lisible par
+ *    `getAdsDiagnostics()`. Sans ça, une pub qui ne s'affiche pas est
+ *    indébogable : on ne peut pas distinguer « consentement refusé » de
+ *    « pas de remplissage » ni de « SDK non initialisé ».
  */
 import { getTrackingPermissionsAsync, requestTrackingPermissionsAsync } from 'expo-tracking-transparency';
 import { Platform } from 'react-native';
@@ -23,10 +28,18 @@ import mobileAds, {
   AdEventType,
   AdsConsent,
   AdsConsentPrivacyOptionsRequirementStatus,
+  AdsConsentStatus,
   InterstitialAd,
   MaxAdContentRating,
   TestIds,
 } from 'react-native-google-mobile-ads';
+
+/**
+ * Affiche le bloc de diagnostic dans Réglages. **À repasser à `false` avant de
+ * soumettre à l'App Store** : c'est un outil de mise au point, pas une
+ * fonctionnalité.
+ */
+export const ADS_DEBUG = true;
 
 /** En développement, les identifiants officiels de test de Google. */
 const INTERSTITIAL_UNIT_ID = __DEV__
@@ -38,6 +51,12 @@ let canRequestAds = false;
 let privacyOptionsRequired = false;
 let personalized = false;
 
+/** Dernier état connu, pour le diagnostic. */
+let consentStatus = 'jamais interrogé';
+let formAvailable: boolean | null = null;
+let lastError: string | null = null;
+let requestCount = 0;
+
 /** L'interstitiel préchargé, prêt à être montré. */
 let ad: InterstitialAd | null = null;
 let adLoaded = false;
@@ -45,9 +64,28 @@ let retries = 0;
 
 const MAX_RETRIES = 3;
 
+function statusLabel(s: AdsConsentStatus): string {
+  switch (s) {
+    case AdsConsentStatus.REQUIRED:
+      return 'requis, non obtenu';
+    case AdsConsentStatus.OBTAINED:
+      return 'obtenu';
+    case AdsConsentStatus.NOT_REQUIRED:
+      return 'non requis (hors UE)';
+    default:
+      return 'inconnu';
+  }
+}
+
+function note(step: string, e: unknown) {
+  const msg = e instanceof Error ? e.message : String(e);
+  lastError = `${step} : ${msg}`.slice(0, 180);
+}
+
 function preload() {
   if (!canRequestAds) return;
   adLoaded = false;
+  requestCount += 1;
   ad = InterstitialAd.createForAdRequest(INTERSTITIAL_UNIT_ID, {
     requestNonPersonalizedAdsOnly: !personalized,
   });
@@ -55,8 +93,9 @@ function preload() {
     adLoaded = true;
     retries = 0;
   });
-  ad.addAdEventListener(AdEventType.ERROR, () => {
+  ad.addAdEventListener(AdEventType.ERROR, (e) => {
     adLoaded = false;
+    note('chargement', e);
     // Un chargement raté ne doit pas condamner toute la session. C'est le cas
     // courant : réseau absent, ou bloc d'annonces récent qui ne remplit pas
     // encore. On retente, de plus en plus espacé, et chaque lancement de
@@ -69,6 +108,25 @@ function preload() {
   ad.load();
 }
 
+/** Recueille le consentement et met à jour l'état lisible. */
+async function gather() {
+  try {
+    const info = await AdsConsent.gatherConsent();
+    canRequestAds = info.canRequestAds;
+    consentStatus = statusLabel(info.status);
+    formAvailable = info.status !== AdsConsentStatus.REQUIRED;
+    privacyOptionsRequired =
+      info.privacyOptionsRequirementStatus ===
+      AdsConsentPrivacyOptionsRequirementStatus.REQUIRED;
+  } catch (e) {
+    note('consentement', e);
+    consentStatus = 'erreur';
+    formAvailable = false;
+    // Sans information de consentement, on reste en pubs non personnalisées.
+    canRequestAds = true;
+  }
+}
+
 /**
  * Consentement, puis initialisation du SDK. Appelé une fois au démarrage.
  * N'interrompt jamais le lancement de l'app : tout est encapsulé.
@@ -77,20 +135,10 @@ export async function initAds(): Promise<void> {
   if (initialized) return;
   initialized = true;
 
-  try {
-    // 1. RGPD : le formulaire Google ne s'affiche que s'il est requis (UE).
-    const info = await AdsConsent.gatherConsent();
-    canRequestAds = info.canRequestAds;
-    privacyOptionsRequired =
-      info.privacyOptionsRequirementStatus ===
-      AdsConsentPrivacyOptionsRequirementStatus.REQUIRED;
-  } catch {
-    // Sans information de consentement, on reste en pubs non personnalisées.
-    canRequestAds = true;
-  }
+  await gather();
 
   try {
-    // 2. ATT : nécessaire pour la personnalisation sur iOS, facultatif ailleurs.
+    // ATT : nécessaire pour la personnalisation sur iOS, facultatif ailleurs.
     if (Platform.OS === 'ios') {
       const current = await getTrackingPermissionsAsync();
       const status = current.canAskAgain && current.status !== 'granted'
@@ -100,19 +148,21 @@ export async function initAds(): Promise<void> {
     } else {
       personalized = true;
     }
-  } catch {
+  } catch (e) {
+    note('suivi', e);
     personalized = false;
   }
 
   try {
-    // 3. Contenu calibré sur la classification 4+ de la fiche App Store.
+    // Contenu calibré sur la classification 4+ de la fiche App Store.
     await mobileAds().setRequestConfiguration({
       maxAdContentRating: MaxAdContentRating.G,
       tagForChildDirectedTreatment: false,
       tagForUnderAgeOfConsent: false,
     });
     await mobileAds().initialize();
-  } catch {
+  } catch (e) {
+    note('initialisation', e);
     canRequestAds = false;
   }
 
@@ -128,9 +178,48 @@ export function hasPrivacyOptions(): boolean {
 export async function showPrivacyOptions(): Promise<void> {
   try {
     await AdsConsent.showPrivacyOptionsForm();
-  } catch {
-    // Formulaire indisponible : on ne signale rien, l'entrée est discrète.
+  } catch (e) {
+    note('options de confidentialité', e);
   }
+}
+
+/**
+ * Efface le consentement mémorisé et rejoue la demande. Permet de revoir le
+ * formulaire sans désinstaller l'app — indispensable pour tester.
+ */
+export async function resetConsent(): Promise<void> {
+  try {
+    AdsConsent.reset();
+  } catch (e) {
+    note('réinitialisation', e);
+  }
+  await gather();
+  preload();
+}
+
+export type AdsDiagnostics = {
+  consentStatus: string;
+  canRequestAds: boolean;
+  formAvailable: boolean | null;
+  privacyOptionsRequired: boolean;
+  personalized: boolean;
+  adLoaded: boolean;
+  requestCount: number;
+  lastError: string | null;
+};
+
+/** Photographie de l'état du SDK, pour le bloc de diagnostic des réglages. */
+export function getAdsDiagnostics(): AdsDiagnostics {
+  return {
+    consentStatus,
+    canRequestAds,
+    formAvailable,
+    privacyOptionsRequired,
+    personalized,
+    adLoaded,
+    requestCount,
+    lastError,
+  };
 }
 
 /**
@@ -159,8 +248,8 @@ export async function showBeforeMatch(): Promise<void> {
     });
     await ad.show();
     await closed;
-  } catch {
-    // Affichage impossible : on passe, la partie démarre quand même.
+  } catch (e) {
+    note('affichage', e);
   } finally {
     preload();
   }
