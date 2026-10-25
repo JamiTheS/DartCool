@@ -13,4 +13,4 @@ export function hasPrivacyOptions(): boolean {
 
 export async function showPrivacyOptions(): Promise<void> {}
 
-export async function onGameFinished(_matchId: string | null): Promise<void> {}
+export async function showBeforeMatch(): Promise<void> {}

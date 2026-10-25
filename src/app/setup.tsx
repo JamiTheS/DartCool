@@ -12,6 +12,7 @@ import {
   View,
 } from 'react-native';
 
+import { showBeforeMatch } from '@/ads';
 import { Plus, Shuffle } from '@/components/icons';
 import { Btn, Card, Divider, Label, Screen, Segmented, Sheet, Stepper, ToggleRow, TopBar } from '@/components/ui';
 import { MODES, matchTitle, presetById } from '@/data/modes';
@@ -88,11 +89,14 @@ export default function Setup() {
   const enough = selected.length >= mode.minPlayers;
   const tooMany = selected.length > mode.maxPlayers;
 
-  const start = () => {
+  const start = async () => {
     if (!enough || tooMany) {
       tapError();
       return;
     }
+    // La pub passe avant la création de la partie : si elle ne se charge pas,
+    // `showBeforeMatch` rend la main aussitôt et la partie démarre quand même.
+    await showBeforeMatch();
     const m = startMatch({
       modeId,
       presetId: preset?.id ?? modeId,

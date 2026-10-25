@@ -27,7 +27,7 @@ const SECTIONS: { title: string; body: string }[] = [
   {
     title: 'Publicité',
     body:
-      'L’application est gratuite et financée par la publicité. Une annonce peut s’afficher en quittant l’écran de résultat, au maximum une partie sur trois, et jamais pendant une partie. Ces annonces sont fournies par Google AdMob, qui se connecte à ses serveurs pour les afficher et les mesurer, et peut à cette occasion traiter un identifiant publicitaire, votre adresse IP et des informations techniques sur l’appareil. C’est le seul moment où l’application utilise le réseau.',
+      'L’application est gratuite et financée par la publicité. Une annonce peut s’afficher au lancement d’une partie, revanche comprise, mais jamais pendant que vous jouez. Ces annonces sont fournies par Google AdMob, qui se connecte à ses serveurs pour les afficher et les mesurer, et peut à cette occasion traiter un identifiant publicitaire, votre adresse IP et des informations techniques sur l’appareil. C’est le seul moment où l’application utilise le réseau.',
   },
   {
     title: 'Votre choix sur la publicité',

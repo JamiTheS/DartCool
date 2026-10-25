@@ -66,15 +66,24 @@ store/              métadonnées App Store et captures
 
 ## Publicité (`src/ads`)
 
-Un seul format : **un interstitiel, à la sortie de l'écran Résultat**. Jamais pendant une partie —
-la cible occupe l'écran, les cibles de toucher font 46 px, et une bannière provoquerait des
-erreurs de saisie. Cadence : une partie sur trois au plus, et jamais deux pubs à moins de cinq
-minutes. L'état de cadence est persisté sous `dartcool.ads`.
+Un seul format : **un interstitiel au lancement de chaque partie** — bouton « Lancer la partie »
+de `setup.tsx` et « Revanche » de `summary.tsx`, qui est un lancement comme un autre. Jamais
+pendant une partie : la cible occupe l'écran, les cibles de toucher font 46 px, et une bannière
+provoquerait des erreurs de saisie. Revenir à l'accueil n'affiche rien.
+
+Pas de cadence : c'est un choix assumé de Damien (25/10), contre mon avis — une pub avant chaque
+partie est ce qui expose le plus aux mauvaises notes, surtout sur un enchaînement de revanches.
+Pour revenir en arrière, il suffit de remettre un compteur dans `showBeforeMatch()`.
 
 `initAds()` est appelé par `_layout.tsx` une fois l'app affichée : consentement Google UMP (RGPD),
 puis App Tracking Transparency sur iOS, puis seulement l'initialisation du SDK. Tout est
-encapsulé : un échec n'empêche jamais l'app de démarrer, et `onGameFinished()` résout toujours,
-avec ou sans pub, pour que la navigation ne dépende pas de la publicité.
+encapsulé : un échec n'empêche jamais l'app de démarrer, et `showBeforeMatch()` résout toujours,
+avec ou sans pub, pour que la partie ne dépende jamais de la publicité.
+
+**Sans message de consentement publié dans AdMob** (Confidentialité et messages → Réglementations
+européennes), le SDK ne fait aucune demande dans l'UE : zéro pub, silencieusement. C'est la
+première chose à vérifier si rien ne s'affiche — le compteur « Demandes » d'AdMob reste à 0, ce
+qui distingue ce cas d'un simple défaut de remplissage.
 
 `src/ads/index.web.ts` neutralise tout sur le web : le SDK n'y existe pas, et `npm run web` sert
 à produire les captures de la fiche App Store.

@@ -13,7 +13,6 @@ export const KEYS = {
   history: PREFIX + 'history',
   current: PREFIX + 'current',
   lineup: PREFIX + 'lineup',
-  ads: PREFIX + 'ads',
 } as const;
 
 export async function loadJSON<T>(key: string, fallback: T): Promise<T> {

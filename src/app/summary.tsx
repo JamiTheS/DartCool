@@ -3,7 +3,7 @@ import { router } from 'expo-router';
 import React from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
-import { onGameFinished } from '@/ads';
+import { showBeforeMatch } from '@/ads';
 import { BoardMark } from '@/components/BoardInput';
 import { Trophy } from '@/components/icons';
 import { Btn, Card, Divider, Label, Screen, TopBar } from '@/components/ui';
@@ -34,27 +34,20 @@ export default function Summary() {
     match.players.find((p) => p.id === winner.playerId)?.color ?? C.pink;
 
   /**
-   * Sortie de l'écran Résultat : c'est le seul endroit de l'app où une pub
-   * peut s'afficher, et seulement une partie sur trois (voir `src/ads`).
-   * `onGameFinished` résout toujours, y compris sans pub, donc la navigation
-   * suit dans tous les cas.
+   * Une revanche est un lancement de partie comme un autre : la pub s'y
+   * applique. `showBeforeMatch` résout toujours, avec ou sans pub.
    */
-  const leave = async (go: () => void) => {
-    await onGameFinished(match.id);
-    go();
+  const goRematch = async () => {
+    await showBeforeMatch();
+    const m = rematch();
+    if (m) router.replace('/match');
   };
 
-  const goRematch = () =>
-    leave(() => {
-      const m = rematch();
-      if (m) router.replace('/match');
-    });
-
-  const goHome = () =>
-    leave(() => {
-      abandonMatch();
-      router.replace('/');
-    });
+  /** Revenir à l'accueil n'est pas un lancement : aucune pub ici. */
+  const goHome = () => {
+    abandonMatch();
+    router.replace('/');
+  };
 
   return (
     <Screen>

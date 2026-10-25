@@ -1,19 +1,21 @@
 /**
- * Publicité : un seul interstitiel, à la sortie d'une partie terminée.
+ * Publicité : un interstitiel au lancement de chaque partie.
  *
  * Règles qu'on s'impose, et qui expliquent la forme de ce fichier :
  *
  * 1. **Jamais pendant une partie.** La cible occupe l'écran et les zones de
  *    toucher font 46 px : une bannière provoquerait des erreurs de saisie et
  *    casserait la règle « écran unique sans défilement ». Le seul point
- *    d'affichage est la sortie de l'écran Résultat.
- * 2. **Cadence tenue, pas une pub par partie.** Une partie sur trois au plus,
- *    et jamais deux fois en moins de cinq minutes.
- * 3. **Rien ne casse si la pub échoue.** Consentement refusé, réseau absent,
- *    chargement raté : on continue sans bloquer la navigation. Chaque appel
- *    public résout toujours, même en cas d'erreur.
- * 4. **Consentement avant toute requête.** Formulaire Google UMP (RGPD) puis
+ *    d'affichage est le lancement — y compris une revanche, qui est un
+ *    lancement comme un autre.
+ * 2. **La pub ne retarde jamais le jeu.** Si rien n'est prêt — réseau absent,
+ *    chargement raté, consentement refusé — on enchaîne directement sur la
+ *    partie. `showBeforeMatch()` résout toujours, l'appelant n'a aucun cas
+ *    particulier à gérer.
+ * 3. **Consentement avant toute requête.** Formulaire Google UMP (RGPD) puis
  *    App Tracking Transparency, et seulement ensuite l'initialisation du SDK.
+ *    Sans message de consentement publié côté AdMob, le SDK n'a le droit de
+ *    faire aucune demande dans l'UE — c'est silencieux et c'est normal.
  */
 import { getTrackingPermissionsAsync, requestTrackingPermissionsAsync } from 'expo-tracking-transparency';
 import { Platform } from 'react-native';
@@ -26,30 +28,11 @@ import mobileAds, {
   TestIds,
 } from 'react-native-google-mobile-ads';
 
-import { KEYS, loadJSON, saveJSON } from '@/utils/storage';
-
 /** En développement, les identifiants officiels de test de Google. */
 const INTERSTITIAL_UNIT_ID = __DEV__
   ? TestIds.INTERSTITIAL
   : 'ca-app-pub-4942532111934732/6643593025';
 
-/** Une partie sur trois au plus. */
-const GAMES_BETWEEN_ADS = 3;
-/** Et jamais deux interstitiels à moins de cinq minutes d'intervalle. */
-const MIN_INTERVAL_MS = 5 * 60 * 1000;
-
-type AdsState = {
-  /** Parties terminées depuis le dernier interstitiel affiché. */
-  gamesSinceAd: number;
-  /** Horodatage du dernier affichage. */
-  lastShownAt: number;
-  /** Dernière partie comptée, pour ne pas compter deux fois la même. */
-  lastMatchId: string | null;
-};
-
-const EMPTY: AdsState = { gamesSinceAd: 0, lastShownAt: 0, lastMatchId: null };
-
-let state: AdsState = EMPTY;
 let initialized = false;
 let canRequestAds = false;
 let privacyOptionsRequired = false;
@@ -76,8 +59,8 @@ function preload() {
     adLoaded = false;
     // Un chargement raté ne doit pas condamner toute la session. C'est le cas
     // courant : réseau absent, ou bloc d'annonces récent qui ne remplit pas
-    // encore. On retente, de plus en plus espacé, et `onGameFinished` relance
-    // de toute façon à la partie suivante.
+    // encore. On retente, de plus en plus espacé, et chaque lancement de
+    // partie relance de toute façon.
     if (retries < MAX_RETRIES) {
       retries += 1;
       setTimeout(preload, retries * 30000);
@@ -133,7 +116,6 @@ export async function initAds(): Promise<void> {
     canRequestAds = false;
   }
 
-  state = await loadJSON<AdsState>(KEYS.ads, EMPTY);
   preload();
 }
 
@@ -152,25 +134,13 @@ export async function showPrivacyOptions(): Promise<void> {
 }
 
 /**
- * Enregistre une partie terminée et montre un interstitiel si la cadence le
- * permet. Résout quand la pub est fermée, ou aussitôt s'il n'y en a pas :
- * l'appelant peut donc naviguer juste après, sans cas particulier.
+ * Montre l'interstitiel avant de démarrer une partie, puis résout. Si aucune
+ * pub n'est prête, résout aussitôt et relance un chargement pour la fois
+ * suivante : la partie démarre sans attendre, dans tous les cas.
  */
-export async function onGameFinished(matchId: string | null): Promise<void> {
+export async function showBeforeMatch(): Promise<void> {
   if (!canRequestAds) return;
 
-  if (matchId && matchId !== state.lastMatchId) {
-    state = { ...state, gamesSinceAd: state.gamesSinceAd + 1, lastMatchId: matchId };
-    await saveJSON(KEYS.ads, state);
-  }
-
-  const due = state.gamesSinceAd >= GAMES_BETWEEN_ADS;
-  const rested = Date.now() - state.lastShownAt >= MIN_INTERVAL_MS;
-  if (!due || !rested) return;
-
-  // La cadence autorise une pub mais rien n'est prêt : on relance un
-  // chargement pour la prochaine fois plutôt que de rester bloqué sans pub
-  // jusqu'au prochain démarrage de l'app.
   if (!adLoaded || !ad) {
     retries = 0;
     preload();
@@ -183,16 +153,14 @@ export async function onGameFinished(matchId: string | null): Promise<void> {
         offClosed();
         resolve();
       });
-      // Filet : si l'événement de fermeture n'arrive pas, on ne bloque pas
-      // la navigation indéfiniment.
+      // Filet : si l'événement de fermeture n'arrive pas, on ne retient pas
+      // le joueur devant un écran bloqué.
       setTimeout(resolve, 30000);
     });
     await ad.show();
     await closed;
-    state = { ...state, gamesSinceAd: 0, lastShownAt: Date.now() };
-    await saveJSON(KEYS.ads, state);
   } catch {
-    // Affichage impossible : on passe, la partie suivante retentera.
+    // Affichage impossible : on passe, la partie démarre quand même.
   } finally {
     preload();
   }
