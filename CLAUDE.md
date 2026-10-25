@@ -85,6 +85,13 @@ européennes), le SDK ne fait aucune demande dans l'UE : zéro pub, silencieusem
 première chose à vérifier si rien ne s'affiche — le compteur « Demandes » d'AdMob reste à 0, ce
 qui distingue ce cas d'un simple défaut de remplissage.
 
+`ADS_DEBUG` (en tête de `src/ads/index.ts`) affiche un bloc **« Diagnostic publicité »** en bas
+des Réglages : état du consentement, droit de demander des pubs, ATT, pub chargée, nombre de
+demandes, dernière erreur, et un bouton qui rejoue le consentement sans réinstaller l'app.
+**À repasser à `false` avant toute soumission à l'App Store** — c'est un outil de mise au point,
+pas une fonctionnalité. Il existe parce que le module avale ses erreurs par conception : sans
+lui, une pub absente est indébogable.
+
 `src/ads/index.web.ts` neutralise tout sur le web : le SDK n'y existe pas, et `npm run web` sert
 à produire les captures de la fiche App Store.
 
