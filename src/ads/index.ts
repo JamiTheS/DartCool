@@ -58,6 +58,9 @@ let personalized = false;
 /** L'interstitiel préchargé, prêt à être montré. */
 let ad: InterstitialAd | null = null;
 let adLoaded = false;
+let retries = 0;
+
+const MAX_RETRIES = 3;
 
 function preload() {
   if (!canRequestAds) return;
@@ -67,9 +70,18 @@ function preload() {
   });
   ad.addAdEventListener(AdEventType.LOADED, () => {
     adLoaded = true;
+    retries = 0;
   });
   ad.addAdEventListener(AdEventType.ERROR, () => {
     adLoaded = false;
+    // Un chargement raté ne doit pas condamner toute la session. C'est le cas
+    // courant : réseau absent, ou bloc d'annonces récent qui ne remplit pas
+    // encore. On retente, de plus en plus espacé, et `onGameFinished` relance
+    // de toute façon à la partie suivante.
+    if (retries < MAX_RETRIES) {
+      retries += 1;
+      setTimeout(preload, retries * 30000);
+    }
   });
   ad.load();
 }
@@ -154,7 +166,16 @@ export async function onGameFinished(matchId: string | null): Promise<void> {
 
   const due = state.gamesSinceAd >= GAMES_BETWEEN_ADS;
   const rested = Date.now() - state.lastShownAt >= MIN_INTERVAL_MS;
-  if (!due || !rested || !adLoaded || !ad) return;
+  if (!due || !rested) return;
+
+  // La cadence autorise une pub mais rien n'est prêt : on relance un
+  // chargement pour la prochaine fois plutôt que de rester bloqué sans pub
+  // jusqu'au prochain démarrage de l'app.
+  if (!adLoaded || !ad) {
+    retries = 0;
+    preload();
+    return;
+  }
 
   try {
     const closed = new Promise<void>((resolve) => {
