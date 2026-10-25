@@ -5,6 +5,7 @@ import React, { useEffect } from 'react';
 import { LogBox, View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
+import { initAds } from '@/ads';
 import { AppProvider, useApp } from '@/store/app';
 import { C } from '@/theme/tokens';
 
@@ -22,6 +23,13 @@ function Gate({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (ready) SplashScreen.hide();
+  }, [ready]);
+
+  // Consentement puis SDK publicitaire, une fois l'app affichée : le
+  // formulaire RGPD ne doit pas se superposer au splash, et un échec ici ne
+  // doit jamais retarder le lancement.
+  useEffect(() => {
+    if (ready) initAds();
   }, [ready]);
 
   useEffect(() => {

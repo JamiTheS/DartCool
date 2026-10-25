@@ -4,6 +4,7 @@ import { router } from 'expo-router';
 import React, { useState } from 'react';
 import { Linking, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
+import { hasPrivacyOptions, showPrivacyOptions } from '@/ads';
 import { ChevronRight } from '@/components/icons';
 import { Btn, Card, Divider, Label, Screen, Segmented, Sheet, ToggleRow, TopBar } from '@/components/ui';
 import { LINKS } from '@/data/links';
@@ -15,6 +16,9 @@ export default function SettingsScreen() {
   const { settings, updateSettings, resetEverything, history, players } = useApp();
   const [reset, setReset] = useState(false);
   const version = Constants.expoConfig?.version ?? '1.0.0';
+  // N'apparaît que là où le consentement publicitaire est exigé (UE) : ailleurs
+  // le formulaire n'existe pas et l'entrée n'aurait rien à ouvrir.
+  const [adChoices] = useState(() => hasPrivacyOptions());
 
   const openUrl = (url: string) => {
     tapLight();
@@ -75,6 +79,20 @@ export default function SettingsScreen() {
             <Text style={[T.bodyStrong, { flex: 1 }]}>Confidentialité</Text>
             <ChevronRight size={18} color={C.ink3} />
           </Pressable>
+          {adChoices ? (
+            <>
+              <Divider />
+              <Pressable
+                style={s.row}
+                onPress={() => {
+                  tapLight();
+                  showPrivacyOptions();
+                }}>
+                <Text style={[T.bodyStrong, { flex: 1 }]}>Préférences publicitaires</Text>
+                <ChevronRight size={18} color={C.ink3} />
+              </Pressable>
+            </>
+          ) : null}
           <Divider />
           <Pressable style={s.row} onPress={() => openUrl(LINKS.supportUrl)}>
             <Text style={[T.bodyStrong, { flex: 1 }]}>Aide et contact</Text>

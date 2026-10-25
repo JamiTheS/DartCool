@@ -2,7 +2,7 @@
   "expo": {
     "name": "DartCool",
     "slug": "dartcool",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "dartcool",
@@ -40,6 +40,14 @@
     "plugins": [
       "expo-router",
       [
+        "react-native-google-mobile-ads",
+        {
+          "iosAppId": "ca-app-pub-4942532111934732~6176689160",
+          "androidAppId": "ca-app-pub-3940256099942544~3347511713",
+          "userTrackingUsageDescription": "Cette autorisation permet d’afficher des publicités adaptées à vos centres d’intérêt. Elle est facultative : DartCool reste gratuit et vos parties ne quittent jamais votre téléphone."
+        }
+      ],
+      [
         "expo-splash-screen",
         {
           "backgroundColor": "#F5F4F7",
@@ -50,7 +58,9 @@
             "image": "./assets/images/splash-icon.png"
           }
         }
-      ]
+      ],
+      "react-native-google-mobile-ads",
+      "expo-tracking-transparency"
     ],
     "experiments": {
       "typedRoutes": true,

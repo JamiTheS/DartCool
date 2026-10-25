@@ -3,6 +3,7 @@ import { router } from 'expo-router';
 import React from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
+import { onGameFinished } from '@/ads';
 import { BoardMark } from '@/components/BoardInput';
 import { Trophy } from '@/components/icons';
 import { Btn, Card, Divider, Label, Screen, TopBar } from '@/components/ui';
@@ -32,20 +33,35 @@ export default function Summary() {
   const winnerColor =
     match.players.find((p) => p.id === winner.playerId)?.color ?? C.pink;
 
-  const goRematch = () => {
-    const m = rematch();
-    if (m) router.replace('/match');
+  /**
+   * Sortie de l'écran Résultat : c'est le seul endroit de l'app où une pub
+   * peut s'afficher, et seulement une partie sur trois (voir `src/ads`).
+   * `onGameFinished` résout toujours, y compris sans pub, donc la navigation
+   * suit dans tous les cas.
+   */
+  const leave = async (go: () => void) => {
+    await onGameFinished(match.id);
+    go();
   };
+
+  const goRematch = () =>
+    leave(() => {
+      const m = rematch();
+      if (m) router.replace('/match');
+    });
+
+  const goHome = () =>
+    leave(() => {
+      abandonMatch();
+      router.replace('/');
+    });
 
   return (
     <Screen>
       <TopBar
         title="Résultat"
         subtitle={match.title}
-        onBack={() => {
-          abandonMatch();
-          router.replace('/');
-        }}
+        onBack={goHome}
       />
 
       <ScrollView contentContainerStyle={{ padding: SP.md, paddingBottom: SP.xl, gap: SP.md }}>
@@ -91,14 +107,7 @@ export default function Summary() {
 
         <View style={{ gap: SP.xs }}>
           <Btn label="Revanche" onPress={goRematch} big />
-          <Btn
-            label="Changer de mode"
-            variant="ghost"
-            onPress={() => {
-              abandonMatch();
-              router.replace('/');
-            }}
-          />
+          <Btn label="Changer de mode" variant="ghost" onPress={goHome} />
         </View>
 
         <Text style={[T.small, { textAlign: 'center', color: C.ink3 }]}>

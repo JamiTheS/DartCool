@@ -6,9 +6,13 @@ statistiques des joueurs. Gratuite, hors ligne, sans compte, sans publicité, sa
 
 ## Non négociable
 
-1. **Aucune donnée ne quitte l'appareil.** Pas de backend, pas d'analytics, pas de SDK tiers
-   réseau. La fiche App Store déclare « aucune donnée collectée » : tout ajout de réseau
-   invaliderait cette déclaration.
+1. **Les parties ne quittent pas l'appareil.** Pas de backend, pas d'analytics, pas de compte.
+   Joueurs, historique, statistiques et réglages restent dans AsyncStorage.
+   **Seule exception, depuis la 1.1.0 : le SDK publicitaire Google AdMob** (`src/ads`), qui est
+   le seul accès réseau de l'app. Toute autre dépendance réseau reste exclue, et toute évolution
+   de la publicité doit se répercuter dans `src/app/privacy.tsx`, `docs/privacy-policy.html` et
+   la déclaration de confidentialité d'App Store Connect — les trois doivent toujours dire la
+   même chose que le code.
 2. **Aucun achat intégré.** L'app est gratuite. Introduire un abonnement rouvrirait toute la
    mécanique App Store Connect (guideline 3.1.2, soumission des produits avec la version, etc.).
 3. **Aucune référence à l'alcool, au pari ou à l'argent.** C'est un outil de score sportif ;
@@ -60,6 +64,25 @@ docs/               pages publiées (GitHub Pages) : confidentialité, aide, acc
 store/              métadonnées App Store et captures
 ```
 
+## Publicité (`src/ads`)
+
+Un seul format : **un interstitiel, à la sortie de l'écran Résultat**. Jamais pendant une partie —
+la cible occupe l'écran, les cibles de toucher font 46 px, et une bannière provoquerait des
+erreurs de saisie. Cadence : une partie sur trois au plus, et jamais deux pubs à moins de cinq
+minutes. L'état de cadence est persisté sous `dartcool.ads`.
+
+`initAds()` est appelé par `_layout.tsx` une fois l'app affichée : consentement Google UMP (RGPD),
+puis App Tracking Transparency sur iOS, puis seulement l'initialisation du SDK. Tout est
+encapsulé : un échec n'empêche jamais l'app de démarrer, et `onGameFinished()` résout toujours,
+avec ou sans pub, pour que la navigation ne dépende pas de la publicité.
+
+`src/ads/index.web.ts` neutralise tout sur le web : le SDK n'y existe pas, et `npm run web` sert
+à produire les captures de la fiche App Store.
+
+En développement, les identifiants de test officiels de Google sont utilisés automatiquement
+(`__DEV__`). **L'`androidAppId` d'`app.json` est l'identifiant d'exemple de Google** : l'app n'est
+pas publiée sur Android, il faudra le remplacer avant toute diffusion Play Store.
+
 ## Le moteur — la règle d'or
 
 **Une partie n'est que la liste chronologique des fléchettes lancées** (`Match.darts`).
@@ -91,9 +114,11 @@ est sauvegardée à chaque fléchette : fermer l'app ne perd rien.
 
 ## Design
 
-Identité « craie & sisal » : noir chaud (`#0B0E0C`), craie crème, laiton (`#F0B429`) pour
-l'action et le joueur au lancer, rouge et vert de cible pour les états. Typographie système
-condensée (`DIN Condensed` sur iOS) pour les chiffres, chiffres tabulaires partout.
+Identité claire, posée à la refonte d'octobre 2026 : fond gris très pâle (`#F5F4F7`), cartes
+blanches, encre presque noire (`#16161C`), rose (`#FF9EC4`) pour l'action et le joueur au
+lancer, pêche (`#FFC08A`) en accent secondaire, vert (`#3BA776`) et rouge (`#E5484D`) pour les
+états. Typographie système condensée (`DIN Condensed` sur iOS) pour les chiffres, chiffres
+tabulaires partout.
 **Aucune couleur ni taille en dur dans un composant** : tout vient de `src/theme/tokens.ts`.
 
 Règles d'interface : écran unique sans défilement pendant une partie, cibles de toucher ≥ 46 px,
@@ -109,9 +134,13 @@ npm start              # dev server
 npm run web            # aperçu navigateur (sert aussi aux captures)
 npm run assets         # régénère icônes et splash depuis tools/make-assets.mjs
 npm run store:shots    # recompose les captures App Store depuis store/raw/
+npm run store:creative # compose l'en-tête et le visuel de résultats de recherche
 ```
 
-## État au 10 octobre 2026
+## État au 25 octobre 2026
+
+**DartCool est publié sur l'App Store depuis le 22 octobre 2026** (version 1.0, gratuite, 4+,
+`https://apps.apple.com/fr/app/dartcool/id6821425205`).
 
 Fonctionnel et complet : dix moteurs de jeu vérifiés, quatre écrans de score, trois saisies,
 statistiques, règles, carnet de joueurs, visuels et captures générés, pages web rédigées.
@@ -119,9 +148,37 @@ statistiques, règles, carnet de joueurs, visuels et captures générés, pages 
 Dépôt public : `JamiTheS/DartCool`, branche `main`. Les pages sont en ligne via GitHub Pages
 (`/docs`) : accueil, confidentialité et aide répondent 200.
 
-Reste à faire, côté humain (voir `store/appstore-metadata.md`) :
-- créer la fiche App Store Connect, renseigner `ascAppId` dans `eas.json` ;
-- `eas build --profile production` puis `eas submit`, et tester le build sur un iPhone réel.
+### 1.1.0 — publicité, en préparation
+
+Intégration d'AdMob terminée et vérifiée (`npm run check` passe, l'app démarre) mais **non
+soumise**. Voir la section « Publicité » plus haut pour les règles de placement.
+
+- compte AdMob : app id iOS `ca-app-pub-4942532111934732~6176689160`, bloc interstitiel
+  `ca-app-pub-4942532111934732/6643593025` ;
+- textes de confidentialité réécrits dans l'app **et** sur la page web ;
+- **reste à faire avant soumission** : publier `app-ads.txt` à la racine de
+  `jamithes.github.io` (dépôt `JamiTheS.github.io` à créer — tant qu'il manque, AdMob est en
+  « diffusion d'annonces limitée »), builder, **mettre à jour la déclaration de confidentialité
+  d'App Store Connect** (elle dit encore « aucune donnée collectée », ce qui devient faux), puis
+  soumettre.
+
+### Historique de la première soumission
+
+Version 1.0.0 build 2 soumise le 12 octobre, **refusée le 13 octobre** au titre de la guideline
+2.1 « Information Needed » — demande d'informations liée à un compte développeur sans
+historique, pas un défaut de l'app. Traitement du refus (voir `store/app-review-reply-2.1.md`) :
+- champ **Remarques** d'App Review Information remplacé par une version anglaise couvrant les
+  six points demandés (l'ancienne note française est sauvegardée dans
+  `store/app-review-notes-FR-precedente.md`) ;
+- enregistrement d'écran compressé de 152 Mo à 8,4 Mo (H.264, 886 × 1920, 30 fps), durée et
+  lisibilité intactes ;
+- réponse aux six points **envoyée le 18 octobre à 22:07**, vidéo en pièce jointe ;
+- version **resoumise** dans la foulée : statut « En attente de vérification » ;
+- ressources créatives de la page produit générées par `npm run store:creative` et envoyées :
+  c'est le PNG 16:9 `universel-5244x2950.png` qui sert d'en-tête, App Store Connect refusant le
+  21:9 pourtant documenté. Le visuel attend dans un brouillon de soumission à part — une
+  ressource créative ne part qu'accompagnée d'une version d'app : elle partira donc avec la
+  1.1.0.
 
 Pistes pour la suite : support iPad (implique des captures iPad), anglais, mode équipes,
 export CSV de l'historique, objectifs d'entraînement.
